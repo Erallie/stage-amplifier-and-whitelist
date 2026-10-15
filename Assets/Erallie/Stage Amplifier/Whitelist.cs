@@ -1,13 +1,17 @@
-﻿using UdonSharp;
+using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
+#if ERALLIE_PROTV
 using ArchiTech.ProTV;
+#endif
 
 public class Whitelist : UdonSharpBehaviour
 {
+#if ERALLIE_PROTV
     [Header("Architect TV Whitelist")]
     [Tooltip("The TVManagedWhitelist component used by Architect's TV.")]
     public TVManagedWhitelist tvWhitelist;
+#endif
 
     [Header("Additional Whitelist")]
     [Tooltip("Additional VRChat display names to whitelist on top of Architect's TV whitelist.")]
@@ -39,6 +43,7 @@ public class Whitelist : UdonSharpBehaviour
             return false;
         }
 
+#if ERALLIE_PROTV
         // Architect's authorized users and explicit super users.
         if (Utilities.IsValid(tvWhitelist))
         {
@@ -49,6 +54,7 @@ public class Whitelist : UdonSharpBehaviour
             }
         }
 
+#endif
         // Our additional whitelist.
         if (whitelist != null)
         {

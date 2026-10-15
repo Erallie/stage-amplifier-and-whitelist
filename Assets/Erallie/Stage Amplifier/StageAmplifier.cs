@@ -64,11 +64,6 @@ public class StageAmplifier : UdonSharpBehaviour
 
     public void WhitelistToggled()
     {
-        if (!barrierCollider || barrierCollider == GetComponent<Collider>())
-        {
-            return;
-        }
-
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
 
         if (!Utilities.IsValid(localPlayer))
@@ -76,29 +71,42 @@ public class StageAmplifier : UdonSharpBehaviour
             return;
         }
 
-        bool isWhitelisted = whitelist.IsOnWhitelist(localPlayer);
+        bool isWhitelisted = false;
+        if (whitelist != null)
+        {
+            isWhitelisted = whitelist.IsOnWhitelist(localPlayer);
+        }
         bool isCurrentPerformer = localPlayer.displayName == CurrentPerformer;
 
         if (isWhitelisted)
         {
             // Whitelisted users are never blocked.
-            barrierCollider.enabled = false;
+            if (barrierCollider != null)
+            {
+                barrierCollider.enabled = false;
+            }
             return;
         }
 
         if (WhitelistOnly)
         {
             // Restricted mode: block all non-whitelisted users.
-            barrierCollider.enabled = true;
+            if (barrierCollider != null)
+            {
+                barrierCollider.enabled = true;
+            }
             return;
         }
 
         // Normal mode:
         // Block non-whitelisted users only when somebody else
         // is currently performing.
-        barrierCollider.enabled =
-            CurrentPerformer != "" &&
-            !isCurrentPerformer;
+        if (barrierCollider != null)
+        {
+            barrierCollider.enabled =
+                CurrentPerformer != "" &&
+                !isCurrentPerformer;
+        }
     }
 
     void OnEnable()
@@ -117,9 +125,13 @@ public class StageAmplifier : UdonSharpBehaviour
 
     public override void OnPlayerTriggerStay(VRCPlayerApi player)
     {
-        bool isWhitelisted = whitelist.IsOnWhitelist(player);
+        bool isWhitelisted = false;
+        if (whitelist != null)
+        {
+            isWhitelisted = whitelist.IsOnWhitelist(player);
+        }
 
-        if (WhitelistOnly && !isWhitelisted)
+        if (WhitelistOnly && !isWhitelisted && teleportOnKickTransform != null)
         {
             player.TeleportTo(
                 teleportOnKickTransform.position,
@@ -146,10 +158,13 @@ public class StageAmplifier : UdonSharpBehaviour
             return;
         }
 
-        player.TeleportTo(
-            teleportOnKickTransform.position,
-            teleportOnKickTransform.rotation
-        );
+        if (teleportOnKickTransform != null)
+        {
+            player.TeleportTo(
+                teleportOnKickTransform.position,
+                teleportOnKickTransform.rotation
+            );
+        }
     }
 
     void SetVoiceVolume(VRCPlayerApi player) {
@@ -185,7 +200,10 @@ public class StageAmplifier : UdonSharpBehaviour
 
     void PlayerLeave(VRCPlayerApi player) {
         if (player.displayName == CurrentPerformer) {
-            barrierCollider.enabled = false;
+            if (barrierCollider != null)
+            {
+                barrierCollider.enabled = false;
+            }
             CurrentPerformer = "";
         }
         ResetVoiceVolume(player);

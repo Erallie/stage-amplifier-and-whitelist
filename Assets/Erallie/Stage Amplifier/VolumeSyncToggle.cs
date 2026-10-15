@@ -1,7 +1,9 @@
-﻿using UdonSharp;
+using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
+#if ERALLIE_PROTV
 using ArchiTech.ProTV;
+#endif
 
 public class VolumeSyncToggle : UdonSharpBehaviour
 {
@@ -9,8 +11,10 @@ public class VolumeSyncToggle : UdonSharpBehaviour
     [Tooltip("Set this to the game object that contains the Whitelist script.")]
     public Whitelist whitelist;
 
+#if ERALLIE_PROTV
     [Tooltip("Set this to the ProTV TVManager.")]
     public TVManager tvManager;
+#endif
 
     [Header("Whitelist Settings")]
     [Tooltip("If enabled, this object's mesh will be hidden for people who are not whitelisted.")]
@@ -26,11 +30,13 @@ public class VolumeSyncToggle : UdonSharpBehaviour
         {
             _syncVolume = value;
 
+#if ERALLIE_PROTV
             if (tvManager != null)
             {
                 tvManager.syncVolumeControl = value;
             }
 
+#endif
             switch (value)
             {
                 case true:
@@ -50,7 +56,11 @@ public class VolumeSyncToggle : UdonSharpBehaviour
     void Start()
     {
         // Start with whatever value is currently configured on the TVManager.
+#if ERALLIE_PROTV
         SyncVolume = tvManager != null && tvManager.syncVolumeControl;
+#else
+        SyncVolume = false;
+#endif
     }
 
 
@@ -77,6 +87,9 @@ public class VolumeSyncToggle : UdonSharpBehaviour
 
     public override void Interact()
     {
+#if !ERALLIE_PROTV
+        return;
+#else
         if (!whitelist.IsOnWhitelist(Networking.LocalPlayer))
         {
             return;
@@ -87,5 +100,6 @@ public class VolumeSyncToggle : UdonSharpBehaviour
         SyncVolume = !SyncVolume;
 
         RequestSerialization();
+#endif
     }
 }

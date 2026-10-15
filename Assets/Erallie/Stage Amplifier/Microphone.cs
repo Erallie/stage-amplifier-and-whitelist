@@ -3,7 +3,6 @@ using System;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
-// using VRC.SDK3.Components;
 using VRC.Udon;
 
 public class Microphone : UdonSharpBehaviour
@@ -14,13 +13,9 @@ public class Microphone : UdonSharpBehaviour
 
     [Header("Voice Properties")]
     [Tooltip("This value will be multiplied by the distance between the local player and the player holding the mic to adjust the voice falloff range.")]
-    public float voiceMultiplier = 10f;
+    public float voiceMultiplier = 17f;
     [Tooltip("The minimum volume voices will be. This only takes effect when the local player is closer to the player holding the mic.")]
     public float startingVolume = 25f;
-
-    /* [Header("Other Options")]
-    [Tooltip("If this option is enabled, the microphone will be respawned whenever the game object is toggled on again.")]
-    public bool respawnOnEnable = true; */
 
     private VRC_Pickup vrcPickup;
     void Start()

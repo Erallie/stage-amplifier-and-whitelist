@@ -72,7 +72,6 @@ public class WhitelistedToggle : UdonSharpBehaviour
 
     public void WhitelistUpdated()
     {
-        UnityEngine.Debug.Log("[WhitelistedToggle] WhitelistUpdated RECEIVED on " + gameObject.name);
         bool onWhitelist = whitelist.IsOnWhitelist(Networking.LocalPlayer);
         this.GetComponent<Collider>().enabled = onWhitelist;
         if (hideMeshIfNotWhitelisted) {
