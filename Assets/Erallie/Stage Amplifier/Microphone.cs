@@ -3,8 +3,10 @@ using System;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
+using VRC.SDK3.Components;
 using VRC.Udon;
 
+[RequireComponent(typeof(VRCPickup))]
 public class Microphone : UdonSharpBehaviour
 {
     
