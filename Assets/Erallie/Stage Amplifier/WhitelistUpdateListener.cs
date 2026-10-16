@@ -55,16 +55,14 @@ public class WhitelistUpdateListener : UdonSharpBehaviour
 
     private void RefreshListeners()
     {
-        if (listeners == null)
+        if (listeners != null)
         {
-            return;
-        }
-
-        foreach (UdonSharpBehaviour listener in listeners)
-        {
-            if (listener != null)
+            foreach (UdonSharpBehaviour listener in listeners)
             {
-                listener.SendCustomEvent("WhitelistUpdated");
+                if (listener != null)
+                {
+                    listener.SendCustomEvent("WhitelistUpdated");
+                }
             }
         }
     }

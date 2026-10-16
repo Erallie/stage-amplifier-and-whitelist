@@ -1,4 +1,4 @@
-﻿using UdonSharp;
+using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 
@@ -48,28 +48,39 @@ public class StageWhitelistToggle : UdonSharpBehaviour
 
     public void WhitelistUpdated()
     {
-        bool onWhitelist = whitelist.IsOnWhitelist(Networking.LocalPlayer);
-        this.GetComponent<Collider>().enabled = onWhitelist;
+        bool onWhitelist = false;
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+        if (whitelist != null && Utilities.IsValid(localPlayer))
+        {
+            onWhitelist = whitelist.IsOnWhitelist(localPlayer);
+        }
+        Collider controlCollider = GetComponent<Collider>();
+        if (controlCollider != null)
+        {
+            controlCollider.enabled = onWhitelist;
+        }
         if (hideMeshIfNotWhitelisted) {
-            this.GetComponent<MeshRenderer>().enabled = onWhitelist;
+            MeshRenderer controlMesh = GetComponent<MeshRenderer>();
+            if (controlMesh != null)
+            {
+                controlMesh.enabled = onWhitelist;
+            }
         }
     }
 
     public override void Interact() {
-        if (stageAmplifier == null)
+        if (stageAmplifier != null && Utilities.IsValid(Networking.LocalPlayer))
         {
-            return;
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            Networking.SetOwner(Networking.LocalPlayer, stageAmplifier.gameObject);
+
+            bool value = !stageAmplifier.WhitelistOnly;
+
+            stageAmplifier.WhitelistOnly = value;
+            WhitelistOnly = value;
+
+            stageAmplifier.RequestSerialization();
+            RequestSerialization();
         }
-
-        Networking.SetOwner(Networking.LocalPlayer, gameObject);
-        Networking.SetOwner(Networking.LocalPlayer, stageAmplifier.gameObject);
-
-        bool value = !stageAmplifier.WhitelistOnly;
-
-        stageAmplifier.WhitelistOnly = value;
-        WhitelistOnly = value;
-
-        stageAmplifier.RequestSerialization();
-        RequestSerialization();
     }
 }

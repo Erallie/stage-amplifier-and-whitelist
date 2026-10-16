@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using UdonSharp;
 using UnityEngine;
@@ -27,9 +27,12 @@ public class MinimalAmplifier : UdonSharpBehaviour
     {
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
 
-        float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
-        player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
-        player.SetVoiceLowpass(false);
+        if (Utilities.IsValid(localPlayer) && Utilities.IsValid(player))
+        {
+            float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
+            player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
+            player.SetVoiceLowpass(false);
+        }
     }
 
     #region reset voice volume
@@ -46,8 +49,11 @@ public class MinimalAmplifier : UdonSharpBehaviour
     }
 
     void ResetVoiceVolume(VRCPlayerApi player) {
-        player.SetVoiceDistanceFar(25f);
-        player.SetVoiceLowpass(true);
+        if (Utilities.IsValid(player))
+        {
+            player.SetVoiceDistanceFar(25f);
+            player.SetVoiceLowpass(true);
+        }
     }
 
     #endregion

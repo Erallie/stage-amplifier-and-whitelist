@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using UdonSharp;
 using UnityEngine;
@@ -67,46 +67,44 @@ public class StageAmplifier : UdonSharpBehaviour
     {
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
 
-        if (!Utilities.IsValid(localPlayer))
+        if (Utilities.IsValid(localPlayer))
         {
-            return;
-        }
+            bool isWhitelisted = false;
+            if (whitelist != null)
+            {
+                isWhitelisted = whitelist.IsOnWhitelist(localPlayer);
+            }
+            bool isCurrentPerformer = localPlayer.displayName == CurrentPerformer;
 
-        bool isWhitelisted = false;
-        if (whitelist != null)
-        {
-            isWhitelisted = whitelist.IsOnWhitelist(localPlayer);
-        }
-        bool isCurrentPerformer = localPlayer.displayName == CurrentPerformer;
+            if (isWhitelisted)
+            {
+                // Whitelisted users are never blocked.
+                if (barrierCollider != null)
+                {
+                    barrierCollider.enabled = false;
+                }
+                return;
+            }
 
-        if (isWhitelisted)
-        {
-            // Whitelisted users are never blocked.
+            if (WhitelistOnly)
+            {
+                // Restricted mode: block all non-whitelisted users.
+                if (barrierCollider != null)
+                {
+                    barrierCollider.enabled = true;
+                }
+                return;
+            }
+
+            // Normal mode:
+            // Block non-whitelisted users only when somebody else
+            // is currently performing.
             if (barrierCollider != null)
             {
-                barrierCollider.enabled = false;
+                barrierCollider.enabled =
+                    CurrentPerformer != "" &&
+                    !isCurrentPerformer;
             }
-            return;
-        }
-
-        if (WhitelistOnly)
-        {
-            // Restricted mode: block all non-whitelisted users.
-            if (barrierCollider != null)
-            {
-                barrierCollider.enabled = true;
-            }
-            return;
-        }
-
-        // Normal mode:
-        // Block non-whitelisted users only when somebody else
-        // is currently performing.
-        if (barrierCollider != null)
-        {
-            barrierCollider.enabled =
-                CurrentPerformer != "" &&
-                !isCurrentPerformer;
         }
     }
 
@@ -126,56 +124,62 @@ public class StageAmplifier : UdonSharpBehaviour
 
     public override void OnPlayerTriggerStay(VRCPlayerApi player)
     {
-        bool isWhitelisted = false;
-        if (whitelist != null)
+        if (Utilities.IsValid(player))
         {
-            isWhitelisted = whitelist.IsOnWhitelist(player);
-        }
+            bool isWhitelisted = false;
+            if (whitelist != null)
+            {
+                isWhitelisted = whitelist.IsOnWhitelist(player);
+            }
 
-        if (WhitelistOnly && !isWhitelisted && teleportOnKickTransform != null)
-        {
-            player.TeleportTo(
-                teleportOnKickTransform.position,
-                teleportOnKickTransform.rotation
-            );
-            
-            return;
-        }
+            if (WhitelistOnly && !isWhitelisted && teleportOnKickTransform != null)
+            {
+                player.TeleportTo(
+                    teleportOnKickTransform.position,
+                    teleportOnKickTransform.rotation
+                );
+                
+                return;
+            }
 
-        if (CurrentPerformer == "")
-        {
-            CurrentPerformer = player.displayName;
-        }
+            if (CurrentPerformer == "")
+            {
+                CurrentPerformer = player.displayName;
+            }
 
-        if (isWhitelisted)
-        {
-            SetVoiceVolume(player);
-            return;
-        }
+            if (isWhitelisted)
+            {
+                SetVoiceVolume(player);
+                return;
+            }
 
-        if (player.displayName == CurrentPerformer)
-        {
-            SetVoiceVolume(player);
-            return;
-        }
+            if (player.displayName == CurrentPerformer)
+            {
+                SetVoiceVolume(player);
+                return;
+            }
 
-        if (teleportOnKickTransform != null)
-        {
-            player.TeleportTo(
-                teleportOnKickTransform.position,
-                teleportOnKickTransform.rotation
-            );
+            if (teleportOnKickTransform != null)
+            {
+                player.TeleportTo(
+                    teleportOnKickTransform.position,
+                    teleportOnKickTransform.rotation
+                );
+            }
         }
     }
 
     void SetVoiceVolume(VRCPlayerApi player) {
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
 
-        float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
-        player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
-        player.SetVoiceLowpass(false);
+        if (Utilities.IsValid(localPlayer) && Utilities.IsValid(player))
+        {
+            float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
+            player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
+            player.SetVoiceLowpass(false);
+        }
 
-        if (localPlayer == player)
+        if (Utilities.IsValid(localPlayer) && Utilities.IsValid(player) && localPlayer == player)
         {
             if (meshToHide) {
                 meshToHide.enabled = false;
@@ -200,7 +204,7 @@ public class StageAmplifier : UdonSharpBehaviour
     }
 
     void PlayerLeave(VRCPlayerApi player) {
-        if (player.displayName == CurrentPerformer) {
+        if (Utilities.IsValid(player) && player.displayName == CurrentPerformer) {
             if (barrierCollider != null)
             {
                 barrierCollider.enabled = false;
@@ -211,8 +215,11 @@ public class StageAmplifier : UdonSharpBehaviour
     }
 
     void ResetVoiceVolume(VRCPlayerApi player) {
-        player.SetVoiceDistanceFar(25f);
-        player.SetVoiceLowpass(true);
+        if (Utilities.IsValid(player))
+        {
+            player.SetVoiceDistanceFar(25f);
+            player.SetVoiceLowpass(true);
+        }
 
         if (meshToHide) {
             meshToHide.enabled = true;

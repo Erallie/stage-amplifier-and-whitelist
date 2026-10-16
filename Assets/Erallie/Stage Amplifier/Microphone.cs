@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using UdonSharp;
 using UnityEngine;
@@ -40,7 +40,10 @@ public class Microphone : UdonSharpBehaviour
             _micHeld = value;
 
             if (value == false) {
-                vrcPickup.pickupable = false;
+                if (vrcPickup != null)
+                {
+                    vrcPickup.pickupable = false;
+                }
             }
         }
         get => _micHeld;
@@ -49,19 +52,28 @@ public class Microphone : UdonSharpBehaviour
     void SetVoiceVolume(VRCPlayerApi player) {
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
 
-        float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
-        player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
-        player.SetVoiceLowpass(false);
+        if (Utilities.IsValid(localPlayer) && Utilities.IsValid(player))
+        {
+            float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
+            player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
+            player.SetVoiceLowpass(false);
+        }
     }
 
     void ResetVoiceVolume(VRCPlayerApi player) {
-        player.SetVoiceDistanceFar(25f);
-        player.SetVoiceLowpass(true);
+        if (Utilities.IsValid(player))
+        {
+            player.SetVoiceDistanceFar(25f);
+            player.SetVoiceLowpass(true);
+        }
     }
 
     public override void OnPickup() {
-        Networking.SetOwner(Networking.LocalPlayer, this.gameObject);
-        MicHeld = true;
+        if (Utilities.IsValid(Networking.LocalPlayer))
+        {
+            Networking.SetOwner(Networking.LocalPlayer, this.gameObject);
+            MicHeld = true;
+        }
     }
 
     public override void OnDrop() {
@@ -72,12 +84,12 @@ public class Microphone : UdonSharpBehaviour
         switch (_micHeld) {
             case true:
                 // Debug.Log(Networking.localPlayer.isOwner(this.gameObject));
-                if (!Networking.LocalPlayer.IsOwner(this.gameObject)) {
+                if (Utilities.IsValid(Networking.LocalPlayer) && !Networking.LocalPlayer.IsOwner(this.gameObject)) {
                     SetVoiceVolume(Networking.GetOwner(this.gameObject));
                 }
                 break;
             case false:
-                if (vrcPickup.pickupable == false) {
+                if (vrcPickup != null && vrcPickup.pickupable == false) {
                     ResetVoiceVolume(Networking.GetOwner(this.gameObject));
                     vrcPickup.pickupable = true;
                 }

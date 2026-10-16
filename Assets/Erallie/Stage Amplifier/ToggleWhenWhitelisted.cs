@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -24,11 +24,28 @@ public class ToggleWhenWhitelisted : UdonSharpBehaviour
     }
 
     public void WhitelistUpdated() {
-        foreach(GameObject objectToToggle in objectsToToggle) {
-            if (whitelist.IsOnWhitelist(Networking.LocalPlayer)) {
-                objectToToggle.SetActive(toggleOn);
-            } else {
-                objectToToggle.SetActive(!toggleOn);
+        bool onWhitelist = false;
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+        if (whitelist != null && Utilities.IsValid(localPlayer))
+        {
+            onWhitelist = whitelist.IsOnWhitelist(localPlayer);
+        }
+
+        if (objectsToToggle != null)
+        {
+            foreach (GameObject objectToToggle in objectsToToggle)
+            {
+                if (objectToToggle != null)
+                {
+                    if (onWhitelist)
+                    {
+                        objectToToggle.SetActive(toggleOn);
+                    }
+                    else
+                    {
+                        objectToToggle.SetActive(!toggleOn);
+                    }
+                }
             }
         }
     }

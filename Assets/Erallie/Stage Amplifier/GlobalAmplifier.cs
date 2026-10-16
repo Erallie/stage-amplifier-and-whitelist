@@ -1,4 +1,4 @@
-﻿
+
 
 using System;
 using UdonSharp;
@@ -50,11 +50,24 @@ public class GlobalAmplifier : UdonSharpBehaviour
 
     public void WhitelistUpdated()
     {
-        bool onWhitelist = whitelist.IsOnWhitelist(Networking.LocalPlayer);
-        this.GetComponent<Collider>().enabled = onWhitelist;
+        bool onWhitelist = false;
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+        if (whitelist != null && Utilities.IsValid(localPlayer))
+        {
+            onWhitelist = whitelist.IsOnWhitelist(localPlayer);
+        }
+        Collider controlCollider = GetComponent<Collider>();
+        if (controlCollider != null)
+        {
+            controlCollider.enabled = onWhitelist;
+        }
 
         if (hideMeshIfNotWhitelisted) {
-            this.GetComponent<MeshRenderer>().enabled = onWhitelist;
+            MeshRenderer controlMesh = GetComponent<MeshRenderer>();
+            if (controlMesh != null)
+            {
+                controlMesh.enabled = onWhitelist;
+            }
         }
 
         // If the person currently being amplified is no longer whitelisted,
@@ -62,7 +75,7 @@ public class GlobalAmplifier : UdonSharpBehaviour
         VRCPlayerApi amplifiedPlayer = Networking.GetOwner(this.gameObject);
         if (_amplified && Networking.LocalPlayer == amplifiedPlayer)
         {
-            if (Utilities.IsValid(amplifiedPlayer) && !whitelist.IsOnWhitelist(amplifiedPlayer))
+            if (whitelist != null && Utilities.IsValid(amplifiedPlayer) && !whitelist.IsOnWhitelist(amplifiedPlayer))
             {
                 Amplified = false;
             }
@@ -72,29 +85,38 @@ public class GlobalAmplifier : UdonSharpBehaviour
     void SetVoiceVolume(VRCPlayerApi player) {
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
 
-        float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
-        player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
-        player.SetVoiceLowpass(false);
+        if (Utilities.IsValid(localPlayer) && Utilities.IsValid(player))
+        {
+            float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
+            player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
+            player.SetVoiceLowpass(false);
+        }
     }
 
     void ResetVoiceVolume(VRCPlayerApi player) {
-        player.SetVoiceDistanceFar(25f);
-        player.SetVoiceLowpass(true);
+        if (Utilities.IsValid(player))
+        {
+            player.SetVoiceDistanceFar(25f);
+            player.SetVoiceLowpass(true);
+        }
     }
     public override void Interact()
     {
-        switch (Amplified)
+        if (Utilities.IsValid(Networking.LocalPlayer))
         {
-            case true:
-                if (Networking.LocalPlayer.IsOwner(this.gameObject))
-                {
-                    Amplified = false;
-                }
-                break;
-            case false:
-                    Networking.SetOwner(Networking.LocalPlayer, this.gameObject);
-                    Amplified = true;
-                break;
+            switch (Amplified)
+            {
+                case true:
+                    if (Networking.LocalPlayer.IsOwner(this.gameObject))
+                    {
+                        Amplified = false;
+                    }
+                    break;
+                case false:
+                        Networking.SetOwner(Networking.LocalPlayer, this.gameObject);
+                        Amplified = true;
+                    break;
+            }
         }
     }
 
@@ -108,25 +130,28 @@ public class GlobalAmplifier : UdonSharpBehaviour
 
     
     void Update() {
-        switch (_amplified) {
-            case true:
-                // Debug.Log(Networking.localPlayer.isOwner(this.gameObject));
-                if (!Networking.LocalPlayer.IsOwner(this.gameObject)) {
-                    SetVoiceVolume(Networking.GetOwner(this.gameObject));
-                    InteractionText = "Please Wait";
-                }
-                else
-                {
-                    InteractionText = "Unamplify Yourself";
-                }
-                break;
-            case false:
-                if (hasUpdated == false && !Networking.LocalPlayer.IsOwner(this.gameObject)) {
-                    ResetVoiceVolume(Networking.GetOwner(this.gameObject));
-                    hasUpdated = true;
-                }
-                InteractionText = "Global Amplifier";
-                break;
+        if (Utilities.IsValid(Networking.LocalPlayer))
+        {
+            switch (_amplified) {
+                case true:
+                    // Debug.Log(Networking.localPlayer.isOwner(this.gameObject));
+                    if (!Networking.LocalPlayer.IsOwner(this.gameObject)) {
+                        SetVoiceVolume(Networking.GetOwner(this.gameObject));
+                        InteractionText = "Please Wait";
+                    }
+                    else
+                    {
+                        InteractionText = "Unamplify Yourself";
+                    }
+                    break;
+                case false:
+                    if (hasUpdated == false && !Networking.LocalPlayer.IsOwner(this.gameObject)) {
+                        ResetVoiceVolume(Networking.GetOwner(this.gameObject));
+                        hasUpdated = true;
+                    }
+                    InteractionText = "Global Amplifier";
+                    break;
+            }
         }
     }
 }

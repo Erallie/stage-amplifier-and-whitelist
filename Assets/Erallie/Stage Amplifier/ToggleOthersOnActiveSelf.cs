@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -11,17 +11,23 @@ public class ToggleOthersOnActiveSelf : UdonSharpBehaviour
     public GameObject[] toToggle;
 
     void OnEnable() {
-        if (toToggle.Length != 0) {
+        if (toToggle != null && toToggle.Length != 0) {
             foreach (GameObject thisObj in toToggle) {
-                thisObj.SetActive(true);
+                if (thisObj != null)
+                {
+                    thisObj.SetActive(true);
+                }
             }
         }
     }
 
     void OnDisable() {
-        if (toToggle.Length != 0) {
+        if (toToggle != null && toToggle.Length != 0) {
             foreach (GameObject thisObj in toToggle) {
-                thisObj.SetActive(false);
+                if (thisObj != null)
+                {
+                    thisObj.SetActive(false);
+                }
             }
         }
     }

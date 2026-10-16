@@ -69,33 +69,42 @@ public class VolumeSyncToggle : UdonSharpBehaviour
 
     public void WhitelistUpdated()
     {
-        bool onWhitelist = whitelist.IsOnWhitelist(Networking.LocalPlayer);
+        bool onWhitelist = false;
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+        if (whitelist != null && Utilities.IsValid(localPlayer))
+        {
+            onWhitelist = whitelist.IsOnWhitelist(localPlayer);
+        }
 
         Collider thisCollider = GetComponent<Collider>();
-        thisCollider.enabled = onWhitelist;
+        if (thisCollider != null)
+        {
+            thisCollider.enabled = onWhitelist;
+        }
 
         if (hideMeshIfNotWhitelisted)
         {
             MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
-            meshRenderer.enabled = onWhitelist;
+            if (meshRenderer != null)
+            {
+                meshRenderer.enabled = onWhitelist;
+            }
         }
     }
 
     public override void Interact()
     {
-#if !ERALLIE_PROTV_PACKAGE
-        return;
-#else
-        if (!whitelist.IsOnWhitelist(Networking.LocalPlayer))
+#if ERALLIE_PROTV_PACKAGE
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+        if (whitelist != null && Utilities.IsValid(localPlayer))
         {
-            return;
+            if (whitelist.IsOnWhitelist(localPlayer))
+            {
+                Networking.SetOwner(localPlayer, gameObject);
+                SyncVolume = !SyncVolume;
+                RequestSerialization();
+            }
         }
-
-        Networking.SetOwner(Networking.LocalPlayer, gameObject);
-
-        SyncVolume = !SyncVolume;
-
-        RequestSerialization();
 #endif
     }
 }
