@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.SDK3.Components;
 
+[RequireComponent(typeof(Collider))]
 public class WhitelistedToggle : UdonSharpBehaviour
 {
     [Header("Access")]

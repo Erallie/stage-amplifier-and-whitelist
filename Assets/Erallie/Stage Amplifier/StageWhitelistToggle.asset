@@ -128,7 +128,7 @@ MonoBehaviour:
       Data: 8|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Whitelist, Assembly-CSharp
+      Data: Whitelist, Erallie.StageAmplifier.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -255,7 +255,7 @@ MonoBehaviour:
       Data: 16|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: StageAmplifier, Assembly-CSharp
+      Data: StageAmplifier, Erallie.StageAmplifier.Runtime
     - Name: 
       Entry: 8
       Data: 

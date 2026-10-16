@@ -5,6 +5,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[RequireComponent(typeof(Collider))]
 public class MinimalAmplifier : UdonSharpBehaviour
 {
     [Header("Voice Properties")]

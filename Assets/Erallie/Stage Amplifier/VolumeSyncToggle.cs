@@ -6,6 +6,7 @@ using VRC.SDKBase;
 using ArchiTech.ProTV;
 #endif
 
+[RequireComponent(typeof(Collider))]
 public class VolumeSyncToggle : UdonSharpBehaviour
 {
     [Header("References")]

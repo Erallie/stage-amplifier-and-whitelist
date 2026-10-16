@@ -6,6 +6,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[RequireComponent(typeof(Collider))]
 public class GlobalAmplifier : UdonSharpBehaviour
 {
     
