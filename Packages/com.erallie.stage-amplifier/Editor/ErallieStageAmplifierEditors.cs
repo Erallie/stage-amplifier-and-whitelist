@@ -410,7 +410,8 @@ namespace Erallie.StageAmplifierInspectors
 
             EditorGUILayout.HelpBox(
                 "Assign this whitelist to every serialized Whitelist field in this scene, " +
-                "including inactive objects. Existing assignments will be replaced.",
+                "including inactive objects. Existing assignments will be replaced. " +
+                "Can be undone with Ctrl+ Z",
                 MessageType.Info);
 
             using (new EditorGUI.DisabledScope(!canAssign))
