@@ -2173,6 +2173,11 @@ PrefabInstance:
       objectReference: {fileID: 383329806}
     - target: {fileID: 8985288477684507859, guid: 6fd15d8f78611a14198be2714af568fa,
         type: 3}
+      propertyPath: nowPlayingId
+      value: ProTV-7d9d7c37
+      objectReference: {fileID: 0}
+    - target: {fileID: 8985288477684507859, guid: 6fd15d8f78611a14198be2714af568fa,
+        type: 3}
       propertyPath: versionNumber
       value: 3.0.0-beta.31
       objectReference: {fileID: 0}
@@ -4053,7 +4058,7 @@ PrefabInstance:
     - target: {fileID: 8444232748569946018, guid: a43296272ecd98942ba52cc7696db644,
         type: 3}
       propertyPath: listeners.Array.size
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8444232748569946018, guid: a43296272ecd98942ba52cc7696db644,
         type: 3}
@@ -4085,6 +4090,11 @@ PrefabInstance:
       propertyPath: listeners.Array.data[5]
       value: 
       objectReference: {fileID: 734540738}
+    - target: {fileID: 8444232748569946018, guid: a43296272ecd98942ba52cc7696db644,
+        type: 3}
+      propertyPath: listeners.Array.data[6]
+      value: 
+      objectReference: {fileID: 177559890}
     - target: {fileID: 8444232748569946018, guid: a43296272ecd98942ba52cc7696db644,
         type: 3}
       propertyPath: serializationData.Prefab

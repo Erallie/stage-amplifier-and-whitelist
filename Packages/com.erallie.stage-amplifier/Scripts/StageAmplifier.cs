@@ -43,7 +43,7 @@ public class StageAmplifier : UdonSharpBehaviour
         set
         {
             _whitelistOnly = value;
-            WhitelistToggled();
+            WhitelistUpdated();
         }
         get => _whitelistOnly;
     }
@@ -58,12 +58,12 @@ public class StageAmplifier : UdonSharpBehaviour
         set
         {
             _currentPerformer = value;
-            WhitelistToggled();
+            WhitelistUpdated();
         }
         get => _currentPerformer;
     }
 
-    public void WhitelistToggled()
+    public void WhitelistUpdated()
     {
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
 
@@ -110,7 +110,7 @@ public class StageAmplifier : UdonSharpBehaviour
 
     void OnEnable()
     {
-        WhitelistToggled();
+        WhitelistUpdated();
     }
 
     void OnDisable() {

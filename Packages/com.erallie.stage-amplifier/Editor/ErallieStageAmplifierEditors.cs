@@ -373,8 +373,130 @@ namespace Erallie.StageAmplifierInspectors
     [CanEditMultipleObjects]
     public class WhitelistEditor : ErallieInspector
     {
+        private string assignmentResult;
+
         protected override string Description =>
             "Handles the whitelist for the Stage Amplifier system. Can be integrated with ProTV's whitelist system.";
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            var whitelist = target as global::Whitelist;
+
+            bool canAssign =
+                targets.Length == 1 &&
+                whitelist != null &&
+                !EditorApplication.isPlayingOrWillChangePlaymode &&
+                !EditorUtility.IsPersistent(whitelist) &&
+                whitelist.gameObject.scene.IsValid() &&
+                whitelist.gameObject.scene.isLoaded;
+
+            EditorGUILayout.Space(8);
+
+            EditorGUILayout.HelpBox(
+                "Assign this whitelist to every serialized Whitelist field in this scene, " +
+                "including inactive objects. Existing assignments will be replaced.",
+                MessageType.Info);
+
+            using (new EditorGUI.DisabledScope(!canAssign))
+            {
+                if (GUILayout.Button("Assign This Whitelist Throughout Scene"))
+                {
+                    serializedObject.ApplyModifiedProperties();
+
+                    int count = AssignThroughoutScene(whitelist);
+
+                    serializedObject.Update();
+
+                    assignmentResult = count == 0
+                        ? "No references needed changing."
+                        : "Assigned this whitelist to " + count + " reference(s).";
+                }
+            }
+
+            if (targets.Length != 1)
+            {
+                EditorGUILayout.HelpBox(
+                    "Select one Whitelist component to assign throughout its scene.",
+                    MessageType.Info);
+            }
+
+            if (!string.IsNullOrEmpty(assignmentResult))
+            {
+                EditorGUILayout.HelpBox(assignmentResult, MessageType.Info);
+            }
+        }
+
+        private static int AssignThroughoutScene(global::Whitelist whitelist)
+        {
+            Undo.IncrementCurrentGroup();
+            int undoGroup = Undo.GetCurrentGroup();
+            Undo.SetCurrentGroupName("Assign Whitelist Throughout Scene");
+
+            int count = 0;
+
+            foreach (GameObject root in whitelist.gameObject.scene.GetRootGameObjects())
+            {
+                foreach (MonoBehaviour component in
+                    root.GetComponentsInChildren<MonoBehaviour>(true))
+                {
+                    if (component == null)
+                    {
+                        continue;
+                    }
+
+                    var componentObject = new SerializedObject(component);
+                    componentObject.Update();
+
+                    Type componentType = component.GetType();
+
+                    while (componentType != null &&
+                        componentType != typeof(MonoBehaviour))
+                    {
+                        FieldInfo[] fields = componentType.GetFields(
+                            BindingFlags.Instance |
+                            BindingFlags.Public |
+                            BindingFlags.NonPublic |
+                            BindingFlags.DeclaredOnly);
+
+                        foreach (FieldInfo field in fields)
+                        {
+                            if (field.FieldType != typeof(global::Whitelist))
+                            {
+                                continue;
+                            }
+
+                            SerializedProperty reference =
+                                componentObject.FindProperty(field.Name);
+
+                            if (reference != null &&
+                                reference.propertyType ==
+                                    SerializedPropertyType.ObjectReference &&
+                                reference.objectReferenceValue != whitelist)
+                            {
+                                reference.objectReferenceValue = whitelist;
+                                count++;
+                            }
+                        }
+
+                        componentType = componentType.BaseType;
+                    }
+
+                    // Serialized properties support Undo and prefab overrides.
+                    componentObject.ApplyModifiedProperties();
+                }
+            }
+
+            if (count > 0)
+            {
+                EditorSceneManager.MarkSceneDirty(whitelist.gameObject.scene);
+            }
+
+            Undo.CollapseUndoOperations(undoGroup);
+
+            return count;
+        }
     }
 
     [CustomEditor(typeof(global::WhitelistedToggle))]
@@ -464,6 +586,7 @@ namespace Erallie.StageAmplifierInspectors
                 found.AddRange(root.GetComponentsInChildren<global::ToggleWhenWhitelisted>(true));
                 found.AddRange(root.GetComponentsInChildren<global::VolumeSyncToggle>(true));
                 found.AddRange(root.GetComponentsInChildren<global::WhitelistedToggle>(true));
+                found.AddRange(root.GetComponentsInChildren<global::StageAmplifier>(true));
             }
 
             var componentObject = new SerializedObject(listener);

@@ -166,9 +166,6 @@ It preserves existing assignments, fills empty slots, and avoids
 adding duplicate references. It searches known component types
 rather than examining arbitrary event names.
 
-The current finder does not include `StageAmplifier`, which implements
-`WhitelistToggled()` rather than `WhitelistUpdated()`.
-
 ### StageAmplifier
 
 Amplifies players inside its trigger and manages stage access.
@@ -190,7 +187,7 @@ Requires a `Collider`. Configure the detection collider as a trigger.
 `CurrentPerformer` records the occupied slot.
 
 Changing either property refreshes barrier state through
-`WhitelistToggled()`.
+`WhitelistUpdated()`.
 
 Exiting, respawning, or leaving resets the player's voice settings
 and clears the slot if they were the recorded performer.

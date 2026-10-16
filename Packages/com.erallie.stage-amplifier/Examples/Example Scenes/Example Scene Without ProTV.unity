@@ -1656,7 +1656,7 @@ PrefabInstance:
     - target: {fileID: 8444232748569946018, guid: a43296272ecd98942ba52cc7696db644,
         type: 3}
       propertyPath: listeners.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8444232748569946018, guid: a43296272ecd98942ba52cc7696db644,
         type: 3}
@@ -1683,6 +1683,11 @@ PrefabInstance:
       propertyPath: listeners.Array.data[4]
       value: 
       objectReference: {fileID: 9133207275496476241}
+    - target: {fileID: 8444232748569946018, guid: a43296272ecd98942ba52cc7696db644,
+        type: 3}
+      propertyPath: listeners.Array.data[5]
+      value: 
+      objectReference: {fileID: 177559890}
     - target: {fileID: 8444232748569946018, guid: a43296272ecd98942ba52cc7696db644,
         type: 3}
       propertyPath: serializationData.Prefab
