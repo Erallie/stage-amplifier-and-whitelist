@@ -18,7 +18,7 @@ public class WhitelistUpdateListener : UdonSharpBehaviour
 #endif
 
     [Header("Listeners")]
-    [Tooltip("UdonSharp behaviours that should receive WhitelistUpdated whenever the whitelist changes.")]
+    [Tooltip("UdonSharp behaviours that should be updated whenever the whitelist changes. To ensure that all applicable scripts are updated, click the button below.")]
     public UdonSharpBehaviour[] listeners;
 
 #if ERALLIE_PROTV_PACKAGE

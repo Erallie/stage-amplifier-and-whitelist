@@ -14,6 +14,9 @@ public class ToggleWhenWhitelisted : UdonSharpBehaviour
     [Tooltip("Add the objects that you want to toggle on and off.")]
     public GameObject[] objectsToToggle;
 
+    [Tooltip("Optional canvases to hide or show.")]
+    public Canvas[] canvassesToHideOrShow;
+
     [Tooltip("Leave this unchecked to toggle the objects off when the user is whitelisted. Check this to toggle the objects on when whitelisted.")]
     public bool toggleOn;
     
@@ -45,6 +48,16 @@ public class ToggleWhenWhitelisted : UdonSharpBehaviour
                     {
                         objectToToggle.SetActive(!toggleOn);
                     }
+                }
+            }
+        }
+        if (canvassesToHideOrShow != null)
+        {
+            foreach (Canvas canvas in canvassesToHideOrShow)
+            {
+                if (canvas != null)
+                {
+                    canvas.enabled = onWhitelist;
                 }
             }
         }

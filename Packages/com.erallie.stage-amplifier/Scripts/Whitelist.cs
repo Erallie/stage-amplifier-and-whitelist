@@ -12,11 +12,15 @@ public class Whitelist : UdonSharpBehaviour
     [Header("Architect TV Whitelist")]
     [Tooltip("The TVManagedWhitelist component used by Architect's TV.")]
     public TVManagedWhitelist tvWhitelist;
-#endif
 
     [Header("Additional Whitelist")]
     [Tooltip("Additional VRChat display names to whitelist on top of Architect's TV whitelist.")]
     public string[] whitelist;
+#else
+    [Header("Whitelist")]
+    [Tooltip("VRChat display names to whitelist in the world.")]
+    public string[] whitelist;
+#endif
 
     [Tooltip("When enabled, the first instance master will also be included in the whitelist.")]
     public bool includeFirstInstanceMaster;

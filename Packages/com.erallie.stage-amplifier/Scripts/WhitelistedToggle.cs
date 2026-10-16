@@ -8,33 +8,31 @@ using VRC.SDK3.Components;
 public class WhitelistedToggle : UdonSharpBehaviour
 {
     [Header("Access")]
-    [Tooltip("The whitelist that authorizes this control. Without a whitelist, interaction is disabled.")]
+    [Tooltip("Set this to the game object that contains the Whitelist script. Without a whitelist, interaction is disabled.")]
     public Whitelist whitelist;
 
     [Tooltip("Hide this object's Mesh Renderer from players who are not whitelisted.")]
     public bool hideMeshIfNotWhitelisted;
 
-    [Tooltip("Optional canvases to hide from players who are not whitelisted.")]
-    public Canvas[] hiddenCanvases;
-
     [Header("Objects")]
-    [Tooltip("Objects to enable or disable for everyone. The first assigned object supplies the initial state. Keep this controller outside these objects so it remains active.")]
+    [Tooltip("Objects to toggle globally.")]
     public GameObject[] objectsToToggle;
 
-    [Tooltip("Transfer ownership of the listed objects and additional child objects to the player using the control. Disable this if ownership should remain unchanged.")]
+    [Tooltip("Transfer ownership of the objects and their children to the player who interacts with this toggle. This is essential if there are Udon behaviours on the objects or their children.")]
     public bool transferOwnership = true;
 
     [Tooltip("Optional additional objects whose ownership should be transferred, such as children containing Udon behaviours.")]
     public GameObject[] childObjects;
 
     [InspectorName("Respawn On Disable")]
-    [Tooltip("Respawn toggled objects with VRC Object Sync when switching them off. The field's original name is preserved to retain existing Inspector assignments.")]
-    public bool respawnOnEnable;
+    [Tooltip("Respawn toggled objects when toggling them off.")]
+    public bool respawnOnDisable;
 
     [Header("Optional UI")]
-    [Tooltip("Optional UI toggle that displays the shared state. Its value is updated without firing On Value Changed. To control this script from the toggle, connect that event to OnMenuToggleChanged.")]
+    [Tooltip("Optional UI toggle that displays whether the objects are toggled on or off. Useful if you have a menu that also toggles these objects locally.")]
     public Toggle menuToggle;
 
+    [Header("Interaction Text")]
     [Tooltip("Interaction text displayed while the objects are on.")]
     public string interactTextWhenOn = "Turn Off Globally";
 
@@ -61,7 +59,7 @@ public class WhitelistedToggle : UdonSharpBehaviour
 
             if (changed &&
                 !value &&
-                respawnOnEnable &&
+                respawnOnDisable &&
                 Networking.IsOwner(gameObject))
             {
                 RespawnObjects();
@@ -119,17 +117,6 @@ public class WhitelistedToggle : UdonSharpBehaviour
             }
         }
 
-        if (hiddenCanvases != null)
-        {
-            foreach (Canvas canvas in hiddenCanvases)
-            {
-                if (canvas != null)
-                {
-                    canvas.enabled = onWhitelist;
-                }
-            }
-        }
-
         if (menuToggle != null)
         {
             menuToggle.interactable = onWhitelist;
@@ -182,7 +169,7 @@ public class WhitelistedToggle : UdonSharpBehaviour
             return;
         }
 
-        if (transferOwnership || (respawnOnEnable && !value))
+        if (transferOwnership || (respawnOnDisable && !value))
         {
             TakeObjectOwnership(objectsToToggle, localPlayer);
         }

@@ -14,7 +14,7 @@ public class Microphone : UdonSharpBehaviour
     private bool _micHeld;
 
     [Header("Voice Properties")]
-    [Tooltip("This value will be multiplied by the distance between the local player and the player holding the mic to adjust the voice falloff range.")]
+    [Tooltip("This value will be multiplied by the distance between the local player and the player holding the mic to adjust the voice falloff range. The default value is generally good for both earmuff mode and non-earmuff mode.")]
     public float voiceMultiplier = 17f;
     [Tooltip("The minimum volume voices will be. This only takes effect when the local player is closer to the player holding the mic.")]
     public float startingVolume = 25f;

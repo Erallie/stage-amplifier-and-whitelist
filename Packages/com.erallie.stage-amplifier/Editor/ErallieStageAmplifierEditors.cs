@@ -1,6 +1,9 @@
 #if UNITY_EDITOR && !COMPILER_UDONSHARP
 using System;
 using System.Reflection;
+using System.Collections.Generic;
+using UdonSharp;
+using UnityEditor.SceneManagement;
 using UdonSharpEditor;
 using UnityEditor;
 using UnityEngine;
@@ -10,6 +13,7 @@ namespace Erallie.StageAmplifierInspectors
     public abstract class ErallieInspector : Editor
     {
         protected abstract string Description { get; }
+        private string whitelistSearchMessage;
 
         public override void OnInspectorGUI()
         {
@@ -54,7 +58,26 @@ namespace Erallie.StageAmplifierInspectors
                     continue;
                 }
 
-                EditorGUILayout.PropertyField(property, true);
+                if (target is global::WhitelistedToggle &&
+                    property.propertyPath == "childObjects")
+                {
+                    SerializedProperty transfer = serializedObject.FindProperty("transferOwnership");
+                    if (transfer != null && !transfer.hasMultipleDifferentValues && !transfer.boolValue)
+                    {
+                        continue;
+                    }
+                }
+                bool isWhitelistReference = property.propertyPath == "whitelist" &&
+                    property.propertyType == SerializedPropertyType.ObjectReference;
+
+                if (isWhitelistReference)
+                {
+                    DrawWhitelistReference(property);
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(property, true);
+                }
 
                 string tooltip = GetTooltip(
                     target.GetType(),
@@ -66,9 +89,158 @@ namespace Erallie.StageAmplifierInspectors
                     EditorGUILayout.HelpBox(tooltip, MessageType.Info);
                     EditorGUILayout.Space(6);
                 }
+
+                if (isWhitelistReference && !string.IsNullOrEmpty(whitelistSearchMessage))
+                {
+                    EditorGUILayout.HelpBox(whitelistSearchMessage, MessageType.Info);
+                }
+
+                DrawAfterProperty(property);
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawWhitelistReference(SerializedProperty property)
+        {
+            // Reserve the property's full height so Header attributes remain intact.
+            float height = EditorGUI.GetPropertyHeight(property, true);
+            Rect row = EditorGUILayout.GetControlRect(true, height);
+            Rect field = row;
+            field.width -= 54f;
+            EditorGUI.PropertyField(field, property, true);
+
+            Rect button = new Rect(row.xMax - 48f,
+                row.yMax - EditorGUIUtility.singleLineHeight,
+                48f, EditorGUIUtility.singleLineHeight);
+
+            bool canSearch = CanFindWhitelist();
+            using (new EditorGUI.DisabledScope(!canSearch))
+            {
+                if (GUI.Button(button, new GUIContent("Find",
+                    "Find a Whitelist in this scene, including inactive objects. " +
+                    "Multiple matches open a selection menu. Select components in the same scene and exit Play Mode.")))
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    FindWhitelist(property.propertyPath);
+                    serializedObject.Update();
+                }
+            }
+        }
+
+        private bool CanFindWhitelist()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                return false;
+            }
+
+            var first = target as Component;
+            if (first == null)
+            {
+                return false;
+            }
+
+            foreach (UnityEngine.Object selected in targets)
+            {
+                var component = selected as Component;
+                if (component == null || EditorUtility.IsPersistent(component) ||
+                    !component.gameObject.scene.IsValid() ||
+                    !component.gameObject.scene.isLoaded ||
+                    component.gameObject.scene != first.gameObject.scene)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void FindWhitelist(string propertyPath)
+        {
+            var component = target as Component;
+            var found = new List<global::Whitelist>();
+            foreach (GameObject root in component.gameObject.scene.GetRootGameObjects())
+            {
+                found.AddRange(root.GetComponentsInChildren<global::Whitelist>(true));
+            }
+
+            // Capture the owners so a menu callback never uses an Inspector iterator.
+            UnityEngine.Object[] owners = (UnityEngine.Object[])targets.Clone();
+            if (found.Count == 0)
+            {
+                whitelistSearchMessage = "No Whitelist component was found in this scene. The current reference was kept.";
+            }
+            else if (found.Count == 1)
+            {
+                AssignWhitelist(owners, propertyPath, found[0]);
+                whitelistSearchMessage = null;
+            }
+            else
+            {
+                whitelistSearchMessage = null;
+                var menu = new GenericMenu();
+                for (int i = 0; i < found.Count; i++)
+                {
+                    global::Whitelist candidate = found[i];
+                    string label = (i + 1) + ". " + GetHierarchyPath(candidate.transform);
+                    menu.AddItem(new GUIContent(label), false,
+                        () => AssignWhitelist(owners, propertyPath, candidate));
+                }
+
+                menu.ShowAsContext();
+            }
+        }
+
+        private static string GetHierarchyPath(Transform item)
+        {
+            string result = item.name;
+            while (item.parent != null)
+            {
+                item = item.parent;
+                result = item.name + " > " + result;
+            }
+
+            return result;
+        }
+
+        private static void AssignWhitelist(UnityEngine.Object[] owners,
+            string propertyPath, global::Whitelist candidate)
+        {
+            if (candidate == null)
+            {
+                return;
+            }
+
+            Undo.SetCurrentGroupName("Find Whitelist");
+            foreach (UnityEngine.Object owner in owners)
+            {
+                var component = owner as Component;
+                if (component == null || EditorUtility.IsPersistent(component) ||
+                    component.gameObject.scene != candidate.gameObject.scene)
+                {
+                    continue;
+                }
+
+                var componentObject = new SerializedObject(owner);
+                componentObject.Update();
+                SerializedProperty reference = componentObject.FindProperty(propertyPath);
+                if (reference != null &&
+                    reference.propertyType == SerializedPropertyType.ObjectReference &&
+                    reference.objectReferenceValue != candidate)
+                {
+                    reference.objectReferenceValue = candidate;
+                    // Serialized properties handle Undo and prefab overrides.
+                    if (componentObject.ApplyModifiedProperties())
+                    {
+                        EditorSceneManager.MarkSceneDirty(component.gameObject.scene);
+                    }
+                }
+            }
+        }
+
+        protected virtual void DrawAfterProperty(SerializedProperty property)
+        {
         }
 
         private static string GetTooltip(Type type, string fieldName)
@@ -105,7 +277,7 @@ namespace Erallie.StageAmplifierInspectors
     public class GlobalAmplifierEditor : ErallieInspector
     {
         protected override string Description =>
-            "Lets a whitelisted user interact to amplify their voice throughout the world. Interact again to stop. Can hide the control from users who are not whitelisted.";
+            "Lets a whitelisted user interact to amplify their voice throughout the world, no matter where they are.";
     }
 
     [CustomEditor(typeof(global::Microphone))]
@@ -113,7 +285,7 @@ namespace Erallie.StageAmplifierInspectors
     public class MicrophoneEditor : ErallieInspector
     {
         protected override string Description =>
-            "Amplifies the voice of the player holding this pickup microphone and restores their normal voice settings when it is dropped. Requires a VRC Pickup component.";
+            "Amplifies the voice of the player when they are holding this pickup.";
     }
 
     [CustomEditor(typeof(global::MinimalAmplifier))]
@@ -121,7 +293,7 @@ namespace Erallie.StageAmplifierInspectors
     public class MinimalAmplifierEditor : ErallieInspector
     {
         protected override string Description =>
-            "Amplifies players while they are inside this object's trigger. Restores normal voice settings when they leave. Requires a trigger collider.";
+            "Amplifies players while they are inside this object's trigger.";
     }
 
     [CustomEditor(typeof(global::StageAmplifier))]
@@ -129,7 +301,7 @@ namespace Erallie.StageAmplifierInspectors
     public class StageAmplifierEditor : ErallieInspector
     {
         protected override string Description =>
-            "Amplifies performers inside the stage trigger. Whitelisted users can share the stage; otherwise, the first performer reserves it. Optional barrier and teleport references control access. Requires a trigger collider.";
+            "Amplifies performers inside this object's trigger. By default, anyone can be onstage, but only one person at a time. Whitelisted players can always enter the stage regardless of whether it is occupied. To restrict stage access to only whitelisted people, add a Stage Whitelist Toggle to the scene.";
     }
 
     [CustomEditor(typeof(global::StageWhitelistToggle))]
@@ -137,7 +309,7 @@ namespace Erallie.StageAmplifierInspectors
     public class StageWhitelistToggleEditor : ErallieInspector
     {
         protected override string Description =>
-            "Lets whitelisted users switch a linked Stage Amplifier between normal access and whitelist-only access. Updates the interaction text to match the current mode.";
+            "Lets whitelisted users switch a linked Stage Amplifier between normal access and whitelist-only access.";
     }
 
     [CustomEditor(typeof(global::ToggleOthersOnActiveSelf))]
@@ -145,7 +317,7 @@ namespace Erallie.StageAmplifierInspectors
     public class ToggleOthersOnActiveSelfEditor : ErallieInspector
     {
         protected override string Description =>
-            "Enables the listed objects when this component is enabled and disables them when it is disabled. The changes are applied locally on each client.";
+            "Enables the listed objects locally when this component is enabled and disables them when it is disabled.";
     }
 
     [CustomEditor(typeof(global::ToggleWhenWhitelisted))]
@@ -153,7 +325,7 @@ namespace Erallie.StageAmplifierInspectors
     public class ToggleWhenWhitelistedEditor : ErallieInspector
     {
         protected override string Description =>
-            "Shows or hides the listed objects locally according to whether the current player is whitelisted. Toggle On selects which state whitelisted players receive.";
+            "Shows or hides the listed objects locally according to whether the current player is whitelisted.";
     }
 
     [CustomEditor(typeof(global::VolumeSyncToggle))]
@@ -161,7 +333,7 @@ namespace Erallie.StageAmplifierInspectors
     public class VolumeSyncToggleEditor : ErallieInspector
     {
         protected override string Description =>
-            "Lets whitelisted users enable or disable ProTV's shared volume control. Requires ProTV and a linked TV Manager; interaction does nothing when ProTV is not installed.";
+            "Lets whitelisted users enable or disable ProTV's shared volume control. This does nothing when ProTV is not installed.";
     }
 
     [CustomEditor(typeof(global::Whitelist))]
@@ -169,7 +341,7 @@ namespace Erallie.StageAmplifierInspectors
     public class WhitelistEditor : ErallieInspector
     {
         protected override string Description =>
-            "Defines authorized players by their VRChat display names. Can also include the first instance master and, when ProTV is installed and linked, ProTV's authorized users and super users.";
+            "Handles the whitelist for the Stage Amplifier system. Can be integrated with ProTV's whitelist system.";
     }
 
     [CustomEditor(typeof(global::WhitelistedToggle))]
@@ -177,15 +349,144 @@ namespace Erallie.StageAmplifierInspectors
     public class WhitelistedToggleEditor : ErallieInspector
     {
         protected override string Description =>
-            "Switches objects on or off for everyone using a whitelist-controlled interaction or optional UI toggle. Supports custom interaction text, hidden canvases, optional ownership transfer, and respawning objects when switched off.";
+            "Whitelisted people can interact with this script to toggle objects on or off for everyone in the instance.";
     }
 
     [CustomEditor(typeof(global::WhitelistUpdateListener))]
     [CanEditMultipleObjects]
     public class WhitelistUpdateListenerEditor : ErallieInspector
     {
+        private string findResult;
+
         protected override string Description =>
-            "Sends WhitelistUpdated to the listed UdonSharp behaviours at startup. When ProTV is installed and linked, also forwards its whitelist updates so the linked controls can refresh.";
+            "Handles updates to the whitelist. If ProTV is integrated with this system's whitelist, this component MUST be attached to an object in the world.";
+
+        protected override void DrawAfterProperty(SerializedProperty property)
+        {
+            if (property.propertyPath != "listeners")
+            {
+                return;
+            }
+
+            bool canSearch = !EditorApplication.isPlayingOrWillChangePlaymode;
+            foreach (UnityEngine.Object selected in targets)
+            {
+                var listener = selected as global::WhitelistUpdateListener;
+                if (listener == null || EditorUtility.IsPersistent(listener) ||
+                    !listener.gameObject.scene.IsValid() || !listener.gameObject.scene.isLoaded)
+                {
+                    canSearch = false;
+                }
+            }
+
+            using (new EditorGUI.DisabledScope(!canSearch))
+            {
+                if (GUILayout.Button("Find and Add Whitelist Listeners"))
+                {
+                    // Commit pending field edits before updating each selected component.
+                    serializedObject.ApplyModifiedProperties();
+                    Undo.SetCurrentGroupName("Find Whitelist Listeners");
+                    int totalAdded = 0;
+                    foreach (UnityEngine.Object selected in targets)
+                    {
+                        var listener = selected as global::WhitelistUpdateListener;
+                        if (listener != null)
+                        {
+                            totalAdded += AddSceneListeners(listener);
+                        }
+                    }
+
+                    serializedObject.Update();
+                    findResult = totalAdded == 0
+                        ? "No new listeners found. Existing assignments were kept."
+                        : "Added " + totalAdded + " listener reference(s).";
+                }
+            }
+
+            if (!canSearch)
+            {
+                EditorGUILayout.HelpBox(
+                    "Open a scene or Prefab Mode and exit Play Mode to find listeners.",
+                    MessageType.Info);
+            }
+
+            if (!string.IsNullOrEmpty(findResult))
+            {
+                EditorGUILayout.HelpBox(findResult, MessageType.Info);
+            }
+
+            EditorGUILayout.Space(6);
+        }
+
+        private static int AddSceneListeners(global::WhitelistUpdateListener listener)
+        {
+            var found = new List<UdonSharpBehaviour>();
+
+            // Explicit list of this package's supported listener types.
+            // Search this scene only, including inactive GameObjects and disabled components.
+            foreach (GameObject root in listener.gameObject.scene.GetRootGameObjects())
+            {
+                found.AddRange(root.GetComponentsInChildren<global::GlobalAmplifier>(true));
+                found.AddRange(root.GetComponentsInChildren<global::StageWhitelistToggle>(true));
+                found.AddRange(root.GetComponentsInChildren<global::ToggleWhenWhitelisted>(true));
+                found.AddRange(root.GetComponentsInChildren<global::VolumeSyncToggle>(true));
+                found.AddRange(root.GetComponentsInChildren<global::WhitelistedToggle>(true));
+            }
+
+            var componentObject = new SerializedObject(listener);
+            componentObject.Update();
+            SerializedProperty list = componentObject.FindProperty("listeners");
+            if (list == null || !list.isArray)
+            {
+                return 0;
+            }
+
+            var assigned = new HashSet<UnityEngine.Object>();
+            for (int i = 0; i < list.arraySize; i++)
+            {
+                UnityEngine.Object existing = list.GetArrayElementAtIndex(i).objectReferenceValue;
+                if (existing != null)
+                {
+                    assigned.Add(existing);
+                }
+            }
+
+            int added = 0;
+            foreach (UdonSharpBehaviour candidate in found)
+            {
+                if (candidate == null || !assigned.Add(candidate))
+                {
+                    continue;
+                }
+
+                int slot = -1;
+                for (int i = 0; i < list.arraySize; i++)
+                {
+                    if (list.GetArrayElementAtIndex(i).objectReferenceValue == null)
+                    {
+                        slot = i;
+                        break;
+                    }
+                }
+
+                if (slot < 0)
+                {
+                    slot = list.arraySize;
+                    list.arraySize++;
+                }
+
+                list.GetArrayElementAtIndex(slot).objectReferenceValue = candidate;
+                added++;
+            }
+
+            // Serialized properties provide Undo and prefab-override tracking.
+            if (componentObject.ApplyModifiedProperties())
+            {
+                EditorSceneManager.MarkSceneDirty(listener.gameObject.scene);
+            }
+
+            return added;
+        }
     }
 }
 #endif
