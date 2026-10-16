@@ -139,6 +139,7 @@ MonoBehaviour:
   - {fileID: 8217950784545478884}
   respawnOnDisable: 0
   menuToggle: {fileID: 0}
+  customizeInteractionText: 0
   interactTextWhenOn: Turn Stage Off Globally
   interactTextWhenOff: Turn Stage On Globally
 --- !u!114 &3785524274752703398
@@ -154,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactTextPlacement: {fileID: 0}
-  interactText: Use
+  interactText: Toggle Stage
   interactTextGO: {fileID: 0}
   proximity: 2
   SynchronizePosition: 0

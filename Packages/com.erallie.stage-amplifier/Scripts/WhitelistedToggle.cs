@@ -33,6 +33,9 @@ public class WhitelistedToggle : UdonSharpBehaviour
     public Toggle menuToggle;
 
     [Header("Interaction Text")]
+    [Tooltip("Override the interaction text according to the toggle state. When unchecked, leave the existing interaction text unchanged.")]
+    public bool customizeInteractionText;
+
     [Tooltip("Interaction text displayed while the objects are on.")]
     public string interactTextWhenOn = "Turn Off Globally";
 
@@ -216,9 +219,12 @@ public class WhitelistedToggle : UdonSharpBehaviour
 
     private void UpdateUI()
     {
-        InteractionText = _toggledOn
-            ? interactTextWhenOn
-            : interactTextWhenOff;
+        if (customizeInteractionText)
+        {
+            InteractionText = _toggledOn
+                ? interactTextWhenOn
+                : interactTextWhenOff;
+        }
 
         if (menuToggle != null)
         {

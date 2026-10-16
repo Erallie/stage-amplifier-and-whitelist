@@ -138,6 +138,7 @@ MonoBehaviour:
   childObjects: []
   respawnOnDisable: 1
   menuToggle: {fileID: 0}
+  customizeInteractionText: 0
   interactTextWhenOn: Turn Microphone Off Globally
   interactTextWhenOff: Turn Microhpone On Globally
 --- !u!114 &128182785741023806
@@ -153,7 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactTextPlacement: {fileID: 0}
-  interactText: Use
+  interactText: Toggle Microphone
   interactTextGO: {fileID: 0}
   proximity: 2
   SynchronizePosition: 0

@@ -67,6 +67,20 @@ namespace Erallie.StageAmplifierInspectors
                         continue;
                     }
                 }
+                if (target is global::WhitelistedToggle &&
+                    (property.propertyPath == "interactTextWhenOn" ||
+                     property.propertyPath == "interactTextWhenOff"))
+                {
+                    SerializedProperty customize =
+                        serializedObject.FindProperty("customizeInteractionText");
+
+                    if (customize != null &&
+                        !customize.hasMultipleDifferentValues &&
+                        !customize.boolValue)
+                    {
+                        continue;
+                    }
+                }
                 Type referenceType = GetReferenceSearchType(property);
                 bool isFindableReference = referenceType != null;
 
