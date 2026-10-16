@@ -133,7 +133,7 @@ MonoBehaviour:
   whitelist: {fileID: 0}
   hideMeshIfNotWhitelisted: 0
   objectsToToggle:
-  - {fileID: 0}
+  - {fileID: 982188192739889261}
   transferOwnership: 1
   childObjects: []
   respawnOnDisable: 1
@@ -178,6 +178,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Microphone
+      objectReference: {fileID: 0}
+    - target: {fileID: 5026855148278606019, guid: 39bd80f7071c6ec4591649039663b352,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5659101355605570169, guid: 39bd80f7071c6ec4591649039663b352,
         type: 3}
@@ -258,6 +263,12 @@ PrefabInstance:
 --- !u!4 &498420000393546455 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5659101355605570169, guid: 39bd80f7071c6ec4591649039663b352,
+    type: 3}
+  m_PrefabInstance: {fileID: 5216176528863623342}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &982188192739889261 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5026855148278606019, guid: 39bd80f7071c6ec4591649039663b352,
     type: 3}
   m_PrefabInstance: {fileID: 5216176528863623342}
   m_PrefabAsset: {fileID: 0}

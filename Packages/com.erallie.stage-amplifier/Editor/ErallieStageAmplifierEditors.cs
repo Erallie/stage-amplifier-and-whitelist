@@ -357,7 +357,7 @@ namespace Erallie.StageAmplifierInspectors
     public class ToggleWhenWhitelistedEditor : ErallieInspector
     {
         protected override string Description =>
-            "Shows or hides the listed objects locally according to whether the current player is whitelisted.";
+            "Shows or hides the listed objects locally according to whether the current player is whitelisted. This script must NOT be in the same object as the Whitelist script.";
     }
 
     [CustomEditor(typeof(global::VolumeSyncToggle))]
