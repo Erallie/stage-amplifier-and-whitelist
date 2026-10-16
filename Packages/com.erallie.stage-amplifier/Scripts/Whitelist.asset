@@ -92,7 +92,7 @@ MonoBehaviour:
       Data: 5|UnityEngine.HeaderAttribute, UnityEngine.CoreModule
     - Name: header
       Entry: 1
-      Data: Additional Whitelist
+      Data: Whitelist
     - Name: 
       Entry: 8
       Data: 
@@ -101,8 +101,7 @@ MonoBehaviour:
       Data: 6|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Additional VRChat display names to whitelist on top of Architect's TV
-        whitelist.
+      Data: VRChat display names to whitelist in the world.
     - Name: 
       Entry: 8
       Data: 

@@ -299,7 +299,7 @@ MonoBehaviour:
       Data: 19|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: The Mesh Renderer to hide for the person onstage.
+      Data: An optional Mesh Renderer to hide for the person onstage.
     - Name: 
       Entry: 8
       Data: 
@@ -362,7 +362,7 @@ MonoBehaviour:
       Data: 23|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: The Canvas to hide for the person onstage.
+      Data: An optional Canvas to hide for the person onstage.
     - Name: 
       Entry: 8
       Data: 
@@ -435,7 +435,8 @@ MonoBehaviour:
     - Name: tooltip
       Entry: 1
       Data: This value will be multiplied by the distance between the local player
-        and the player holding the mic to adjust the voice falloff range.
+        and the player holding the mic to adjust the voice falloff range. The default
+        value is generally good for both earmuff mode and non-earmuff mode.
     - Name: 
       Entry: 8
       Data: 
@@ -493,7 +494,7 @@ MonoBehaviour:
     - Name: tooltip
       Entry: 1
       Data: The minimum volume voices will be. This only takes effect when the local
-        player is closer to the player holding the mic.
+        player is closer to the player(s) onstage.
     - Name: 
       Entry: 8
       Data: 

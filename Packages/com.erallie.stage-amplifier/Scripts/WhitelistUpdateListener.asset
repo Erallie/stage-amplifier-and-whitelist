@@ -107,8 +107,8 @@ MonoBehaviour:
       Data: 7|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: UdonSharp behaviours that should receive WhitelistUpdated whenever the
-        whitelist changes.
+      Data: UdonSharp behaviours that should be updated whenever the whitelist changes.
+        To ensure that all applicable scripts are updated, click the button below.
     - Name: 
       Entry: 8
       Data: 

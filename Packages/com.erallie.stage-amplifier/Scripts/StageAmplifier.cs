@@ -20,10 +20,10 @@ public class StageAmplifier : UdonSharpBehaviour
     [Tooltip("Add a transform to teleport people to if they somehow manage to get past the barrier.")]
     public Transform teleportOnKickTransform;
 
-    [Tooltip("The Mesh Renderer to hide for the person onstage.")]
+    [Tooltip("An optional Mesh Renderer to hide for the person onstage.")]
     public MeshRenderer meshToHide;
 
-    [Tooltip("The Canvas to hide for the person onstage.")]
+    [Tooltip("An optional Canvas to hide for the person onstage.")]
     public Canvas canvasToHide;
     
     [Header("Voice Properties")]

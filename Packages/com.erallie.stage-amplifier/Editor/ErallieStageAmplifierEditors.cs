@@ -13,7 +13,7 @@ namespace Erallie.StageAmplifierInspectors
     public abstract class ErallieInspector : Editor
     {
         protected abstract string Description { get; }
-        private string whitelistSearchMessage;
+        private readonly Dictionary<string, string> referenceSearchMessages = new Dictionary<string, string>();
 
         public override void OnInspectorGUI()
         {
@@ -67,12 +67,12 @@ namespace Erallie.StageAmplifierInspectors
                         continue;
                     }
                 }
-                bool isWhitelistReference = property.propertyPath == "whitelist" &&
-                    property.propertyType == SerializedPropertyType.ObjectReference;
+                Type referenceType = GetReferenceSearchType(property);
+                bool isFindableReference = referenceType != null;
 
-                if (isWhitelistReference)
+                if (isFindableReference)
                 {
-                    DrawWhitelistReference(property);
+                    DrawSceneReference(property, referenceType);
                 }
                 else
                 {
@@ -90,9 +90,10 @@ namespace Erallie.StageAmplifierInspectors
                     EditorGUILayout.Space(6);
                 }
 
-                if (isWhitelistReference && !string.IsNullOrEmpty(whitelistSearchMessage))
+                if (isFindableReference &&
+                    referenceSearchMessages.TryGetValue(property.propertyPath, out string searchMessage))
                 {
-                    EditorGUILayout.HelpBox(whitelistSearchMessage, MessageType.Info);
+                    EditorGUILayout.HelpBox(searchMessage, MessageType.Info);
                 }
 
                 DrawAfterProperty(property);
@@ -101,7 +102,38 @@ namespace Erallie.StageAmplifierInspectors
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void DrawWhitelistReference(SerializedProperty property)
+        private Type GetReferenceSearchType(SerializedProperty property)
+        {
+            if (property.propertyType != SerializedPropertyType.ObjectReference ||
+                (property.propertyPath != "whitelist" &&
+                 property.propertyPath != "tvWhitelist" &&
+                 property.propertyPath != "tvManager"))
+            {
+                return null;
+            }
+
+            // Resolve the field's existing compiled type. This Editor assembly
+            // never needs to reference a ProTV class directly.
+            Type ownerType = target.GetType();
+            while (ownerType != null)
+            {
+                FieldInfo field = ownerType.GetField(property.name,
+                    BindingFlags.Instance | BindingFlags.Public |
+                    BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                if (field != null)
+                {
+                    return typeof(Component).IsAssignableFrom(field.FieldType)
+                        ? field.FieldType
+                        : null;
+                }
+
+                ownerType = ownerType.BaseType;
+            }
+
+            return null;
+        }
+
+        private void DrawSceneReference(SerializedProperty property, Type referenceType)
         {
             // Reserve the property's full height so Header attributes remain intact.
             float height = EditorGUI.GetPropertyHeight(property, true);
@@ -114,21 +146,21 @@ namespace Erallie.StageAmplifierInspectors
                 row.yMax - EditorGUIUtility.singleLineHeight,
                 48f, EditorGUIUtility.singleLineHeight);
 
-            bool canSearch = CanFindWhitelist();
+            bool canSearch = CanFindSceneReference();
             using (new EditorGUI.DisabledScope(!canSearch))
             {
                 if (GUI.Button(button, new GUIContent("Find",
-                    "Find a Whitelist in this scene, including inactive objects. " +
+                    "Find a " + ObjectNames.NicifyVariableName(referenceType.Name) + " in this scene, including inactive objects. " +
                     "Multiple matches open a selection menu. Select components in the same scene and exit Play Mode.")))
                 {
                     serializedObject.ApplyModifiedProperties();
-                    FindWhitelist(property.propertyPath);
+                    FindSceneReference(property.propertyPath, referenceType);
                     serializedObject.Update();
                 }
             }
         }
 
-        private bool CanFindWhitelist()
+        private bool CanFindSceneReference()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
@@ -156,36 +188,36 @@ namespace Erallie.StageAmplifierInspectors
             return true;
         }
 
-        private void FindWhitelist(string propertyPath)
+        private void FindSceneReference(string propertyPath, Type referenceType)
         {
             var component = target as Component;
-            var found = new List<global::Whitelist>();
+            var found = new List<Component>();
             foreach (GameObject root in component.gameObject.scene.GetRootGameObjects())
             {
-                found.AddRange(root.GetComponentsInChildren<global::Whitelist>(true));
+                found.AddRange(root.GetComponentsInChildren(referenceType, true));
             }
 
             // Capture the owners so a menu callback never uses an Inspector iterator.
             UnityEngine.Object[] owners = (UnityEngine.Object[])targets.Clone();
             if (found.Count == 0)
             {
-                whitelistSearchMessage = "No Whitelist component was found in this scene. The current reference was kept.";
+                referenceSearchMessages[propertyPath] = "No " + ObjectNames.NicifyVariableName(referenceType.Name) + " component was found in this scene. The current reference was kept.";
             }
             else if (found.Count == 1)
             {
-                AssignWhitelist(owners, propertyPath, found[0]);
-                whitelistSearchMessage = null;
+                AssignSceneReference(owners, propertyPath, found[0]);
+                referenceSearchMessages.Remove(propertyPath);
             }
             else
             {
-                whitelistSearchMessage = null;
+                referenceSearchMessages.Remove(propertyPath);
                 var menu = new GenericMenu();
                 for (int i = 0; i < found.Count; i++)
                 {
-                    global::Whitelist candidate = found[i];
+                    Component candidate = found[i];
                     string label = (i + 1) + ". " + GetHierarchyPath(candidate.transform);
                     menu.AddItem(new GUIContent(label), false,
-                        () => AssignWhitelist(owners, propertyPath, candidate));
+                        () => AssignSceneReference(owners, propertyPath, candidate));
                 }
 
                 menu.ShowAsContext();
@@ -204,15 +236,15 @@ namespace Erallie.StageAmplifierInspectors
             return result;
         }
 
-        private static void AssignWhitelist(UnityEngine.Object[] owners,
-            string propertyPath, global::Whitelist candidate)
+        private static void AssignSceneReference(UnityEngine.Object[] owners,
+            string propertyPath, Component candidate)
         {
             if (candidate == null)
             {
                 return;
             }
 
-            Undo.SetCurrentGroupName("Find Whitelist");
+            Undo.SetCurrentGroupName("Find Scene Reference");
             foreach (UnityEngine.Object owner in owners)
             {
                 var component = owner as Component;

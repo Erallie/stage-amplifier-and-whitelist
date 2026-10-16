@@ -168,7 +168,8 @@ MonoBehaviour:
     - Name: tooltip
       Entry: 1
       Data: This value will be multiplied by the distance between the local player
-        and the player holding the mic to adjust the voice falloff range.
+        and the player holding the mic to adjust the voice falloff range. The default
+        value is generally good for both earmuff mode and non-earmuff mode.
     - Name: 
       Entry: 8
       Data: 
