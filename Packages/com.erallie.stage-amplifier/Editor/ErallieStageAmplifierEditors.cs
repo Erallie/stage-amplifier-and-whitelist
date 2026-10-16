@@ -57,6 +57,19 @@ namespace Erallie.StageAmplifierInspectors
                 {
                     continue;
                 }
+                
+                if (property.propertyPath == "limitDistance")
+                {
+                    SerializedProperty limitRange =
+                        serializedObject.FindProperty("limitAmplificationRange");
+
+                    if (limitRange != null &&
+                        !limitRange.hasMultipleDifferentValues &&
+                        !limitRange.boolValue)
+                    {
+                        continue;
+                    }
+                }
 
                 if (target is global::WhitelistedToggle &&
                     property.propertyPath == "childObjects")

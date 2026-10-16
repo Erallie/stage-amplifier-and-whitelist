@@ -138,6 +138,8 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 4900984354103111422}
   voiceMultiplier: 17
   startingVolume: 25
+  limitAmplificationRange: 0
+  limitDistance: 100
 --- !u!114 &4900984354103111422
 MonoBehaviour:
   m_ObjectHideFlags: 0

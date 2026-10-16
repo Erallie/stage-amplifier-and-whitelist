@@ -53,6 +53,19 @@ namespace Erallie.MinimalAmplifierInspectors
                     continue;
                 }
 
+                if (property.propertyPath == "limitDistance")
+                {
+                    SerializedProperty limitRange =
+                        serializedObject.FindProperty("limitAmplificationRange");
+
+                    if (limitRange != null &&
+                        !limitRange.hasMultipleDifferentValues &&
+                        !limitRange.boolValue)
+                    {
+                        continue;
+                    }
+                }
+
                 EditorGUILayout.PropertyField(property, true);
 
                 string tooltip = GetTooltip(target.GetType(), property.name);

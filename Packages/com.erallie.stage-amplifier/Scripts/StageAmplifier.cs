@@ -31,6 +31,12 @@ public class StageAmplifier : UdonSharpBehaviour
     public float voiceMultiplier = 17f;
     [Tooltip("The minimum volume voices will be. This only takes effect when the local player is closer to the player(s) onstage.")]
     public float startingVolume = 25f;
+    
+    [Tooltip("Whether or not to stop amplifying the voice when the disatance between the local player and the person onstage is greater than a certain distance.")]
+    public bool limitAmplificationRange = false;
+    
+    [Tooltip("The distance in meters at which voice amplification will stop if Limit Amplification Range is enabled.")]
+    public float limitDistance = 100f;
 
     [UdonSynced, FieldChangeCallback(nameof(CurrentPerformer))]
     private string _currentPerformer;
@@ -175,6 +181,11 @@ public class StageAmplifier : UdonSharpBehaviour
         if (Utilities.IsValid(localPlayer) && Utilities.IsValid(player))
         {
             float distance = Math.Abs(Vector3.Distance(localPlayer.GetPosition(), player.GetPosition()));
+            if (limitAmplificationRange && distance > limitDistance)
+            {
+                ResetVoiceVolume(player);
+                return;
+            }
             player.SetVoiceDistanceFar(Math.Max((voiceMultiplier * distance), startingVolume));
             player.SetVoiceLowpass(false);
         }
