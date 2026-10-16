@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.erallie.stage-amplifier": {
+      "version": "file:com.erallie.stage-amplifier",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.ai.navigation": {
       "version": "1.1.5",
       "depth": 0,
@@ -240,12 +246,6 @@
         "com.unity.nuget.newtonsoft-json": "3.0.2"
       }
     },
-    "com.vrchat.demo-template": {
-      "version": "file:com.vrchat.demo-template",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.vrchat.worlds": {
       "version": "file:com.vrchat.worlds",
       "depth": 0,
@@ -256,36 +256,6 @@
         "com.unity.inputsystem": "1.2.0",
         "com.unity.ai.navigation": "1.1.5"
       }
-    },
-    "dev.architech.protv": {
-      "version": "file:dev.architech.protv",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "dev.architech.protv.extras": {
-      "version": "file:dev.architech.protv.extras",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "dev.architech.sdk": {
-      "version": "file:dev.architech.sdk",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "dev.architech.umbrella": {
-      "version": "file:dev.architech.umbrella",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "dev.architech.videoplayershim": {
-      "version": "file:dev.architech.videoplayershim",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
