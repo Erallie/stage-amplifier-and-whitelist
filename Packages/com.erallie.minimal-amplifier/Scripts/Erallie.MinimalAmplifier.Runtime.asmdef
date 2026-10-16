@@ -1,0 +1,9 @@
+{
+    "name": "Erallie.MinimalAmplifier.Runtime",
+    "references": [
+        "UdonSharp.Runtime",
+        "VRC.Udon",
+        "VRC.SDK3"
+    ],
+    "autoReferenced": true
+}

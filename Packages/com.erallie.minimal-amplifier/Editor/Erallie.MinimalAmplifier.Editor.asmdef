@@ -1,0 +1,13 @@
+{
+    "name": "Erallie.MinimalAmplifier.Editor",
+    "references": [
+        "Erallie.MinimalAmplifier.Runtime",
+        "UdonSharp.Runtime",
+        "UdonSharp.Editor",
+        "VRC.Udon"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": true
+}

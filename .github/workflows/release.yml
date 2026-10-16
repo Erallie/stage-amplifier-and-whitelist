@@ -54,11 +54,16 @@ jobs:
           echo "version=${{ steps.version.outputs.value }}" >> $GITHUB_ENV
 
           
-      - name: Copy documentation into package
+      - name: Copy documentation into both packages
         shell: bash
         run: |
-          cp README.md "${{ env.packagePath }}/README.md"
-          cp LICENSE.md "${{ env.packagePath }}/LICENSE.md"
+          for package in \
+            "Packages/com.erallie.stage-amplifier" \
+            "Packages/com.erallie.minimal-amplifier"
+          do
+            cp README.md "$package/README.md"
+            cp LICENSE.md "$package/LICENSE.md"
+          done
           
       # Zip the Package for release
       - name: Create Package Zip

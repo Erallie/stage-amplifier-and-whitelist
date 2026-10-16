@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.erallie.minimal-amplifier": {
+      "version": "file:com.erallie.minimal-amplifier",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.erallie.stage-amplifier": {
       "version": "file:com.erallie.stage-amplifier",
       "depth": 0,

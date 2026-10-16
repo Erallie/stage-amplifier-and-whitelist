@@ -335,14 +335,6 @@ namespace Erallie.StageAmplifierInspectors
             "Amplifies the voice of the player when they are holding this pickup.";
     }
 
-    [CustomEditor(typeof(global::MinimalAmplifier))]
-    [CanEditMultipleObjects]
-    public class MinimalAmplifierEditor : ErallieInspector
-    {
-        protected override string Description =>
-            "Amplifies players while they are inside this object's trigger.";
-    }
-
     [CustomEditor(typeof(global::StageAmplifier))]
     [CanEditMultipleObjects]
     public class StageAmplifierEditor : ErallieInspector
