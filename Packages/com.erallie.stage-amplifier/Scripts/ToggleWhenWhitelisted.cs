@@ -57,7 +57,14 @@ public class ToggleWhenWhitelisted : UdonSharpBehaviour
             {
                 if (canvas != null)
                 {
-                    canvas.enabled = onWhitelist;
+                    if (onWhitelist)
+                    {
+                        canvas.enabled = toggleOn;
+                    }
+                    else
+                    {
+                        canvas.enabled = !toggleOn;
+                    }
                 }
             }
         }
