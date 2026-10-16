@@ -398,6 +398,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 510559341339006814, guid: 669f63c480b04b44eaba4a61d777ce7f,
         type: 3}
+      propertyPath: whitelist
+      value: 
+      objectReference: {fileID: 766616417}
+    - target: {fileID: 510559341339006814, guid: 669f63c480b04b44eaba4a61d777ce7f,
+        type: 3}
       propertyPath: serializationData.Prefab
       value: 
       objectReference: {fileID: 510559341339006814, guid: 669f63c480b04b44eaba4a61d777ce7f,
