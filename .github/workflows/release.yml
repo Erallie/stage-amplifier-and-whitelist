@@ -1,99 +1,122 @@
 name: Build Release
 
-on: 
-  workflow_dispatch:
+on:
+    workflow_dispatch:
+        inputs:
+            package:
+                description: Package to release
+                required: true
+                type: choice
+                default: com.erallie.minimal-amplifier
+                options:
+                    - com.erallie.stage-amplifier
+                    - com.erallie.minimal-amplifier
+
+permissions:
+    contents: write
+
+concurrency:
+    group: release-${{ inputs.package }}
+    cancel-in-progress: false
 
 jobs:
+    build:
+        runs-on: ubuntu-latest
 
-  # Validate Repository Configuration
-  config:
-    runs-on: ubuntu-latest
-    outputs:
-      config_package: ${{ steps.config_package.outputs.configPackage }}
-    steps:
+        env:
+            PACKAGE_NAME: ${{ inputs.package }}
+            GH_TOKEN: ${{ github.token }}
 
-    # Ensure that required repository variable has been created for the Package
-    - name: Validate Package Config
-      id: config_package
-      run: |
-        if [ "${{ vars.PACKAGE_NAME }}" != "" ]; then
-          echo "configPackage=true" >> $GITHUB_OUTPUT;
-        else
-          echo "configPackage=false" >> $GITHUB_OUTPUT;
-        fi
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-  # Build and release the Package
-  # If the repository is not configured properly, this job will be skipped
-  build:
-    needs: config
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      packagePath: Packages/${{ vars.PACKAGE_NAME }}
-    if: needs.config.outputs.config_package == 'true'
-    steps:
+            - name: Read package information
+              shell: bash
+              run: |
+                  set -euo pipefail
 
-      # Checkout Local Repository
-      - name: Checkout
-        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
+                  packagePath="Packages/$PACKAGE_NAME"
+                  manifest="$packagePath/package.json"
 
-      # Get the Package version based on the package.json file
-      - name: Get Version
-        id: version
-        uses: zoexx/github-action-json-file-properties@b9f36ce6ee6fe2680cd3c32b2c62e22eade7e590
-        with: 
-            file_path: "${{ env.packagePath }}/package.json"
-            prop_path: "version"
-    
-      # Configure the Environment Variables needed for releasing the Package
-      - name: Set Environment Variables
-        run: |
-          echo "zipFile=${{ vars.PACKAGE_NAME }}-${{ steps.version.outputs.value }}".zip >> $GITHUB_ENV
-          echo "unityPackage=${{ vars.PACKAGE_NAME }}-${{ steps.version.outputs.value }}.unitypackage" >> $GITHUB_ENV
-          echo "version=${{ steps.version.outputs.value }}" >> $GITHUB_ENV
+                  actualName=$(jq -er '.name' "$manifest")
+                  version=$(jq -er '.version' "$manifest")
+                  displayName=$(jq -er '.displayName' "$manifest")
 
-          
-      - name: Copy documentation into both packages
-        shell: bash
-        run: |
-          for package in \
-            "Packages/com.erallie.stage-amplifier" \
-            "Packages/com.erallie.minimal-amplifier"
-          do
-            cp README.md "$package/README.md"
-            cp LICENSE.md "$package/LICENSE.md"
-          done
-          
-      # Zip the Package for release
-      - name: Create Package Zip
-        working-directory: "${{ env.packagePath }}"
-        run: zip -r "${{ github.workspace }}/${{ env.zipFile }}" .
-      
-      # Build a list of .meta files for future use
-      - name: Track Package Meta Files
-        run: find "${{ env.packagePath }}/" -name \*.meta >> metaList
-      
-      # Make a UnityPackage version of the Package for release
-      - name: Create UnityPackage
-        uses: pCYSl5EDgo/create-unitypackage@v1.2.3
-        with:
-          package-path: ${{ env.unityPackage }}
-          include-files: metaList
-      
-      # Make a release tag of the version from the package.json file 
-      - name: Create Tag
-        id: tag_version
-        uses: rickstaa/action-create-tag@88dbf7ff6fe2405f8e8f6c6fdfd78829bc631f83
-        with:
-          tag: "${{ env.version }}"
-      
-      # Publish the Release to GitHub
-      - name: Make Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
-        with:
-          files: |
-            ${{ env.zipFile }}
-            ${{ env.unityPackage }}
-            ${{ env.packagePath }}/package.json
-          tag_name: ${{ env.version }}
+                  if [ "$actualName" != "$PACKAGE_NAME" ]; then
+                      echo "::error::Package folder and manifest name do not match."
+                      exit 1
+                  fi
+
+                  # Preserve the existing Stage Amplifier tag format.
+                  # Minimal Amplifier uses its own prefix to avoid collisions.
+                  if [ "$PACKAGE_NAME" = "com.erallie.stage-amplifier" ]; then
+                      releaseTag="$version"
+                  else
+                      releaseTag="$PACKAGE_NAME-$version"
+                  fi
+
+                  echo "packagePath=$packagePath" >> "$GITHUB_ENV"
+                  echo "version=$version" >> "$GITHUB_ENV"
+                  echo "displayName=$displayName" >> "$GITHUB_ENV"
+                  echo "releaseTag=$releaseTag" >> "$GITHUB_ENV"
+                  echo "zipFile=$PACKAGE_NAME-$version.zip" >> "$GITHUB_ENV"
+                  echo "unityPackage=$PACKAGE_NAME-$version.unitypackage" >> "$GITHUB_ENV"
+
+            - name: Check whether version is already released
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  if gh release view "$releaseTag" \
+                      --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1
+                  then
+                      echo "::error::This version is already released. Increase the selected package's version in package.json."
+                      exit 1
+                  fi
+
+            - name: Copy documentation into both packages
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  for package in \
+                      "Packages/com.erallie.stage-amplifier" \
+                      "Packages/com.erallie.minimal-amplifier"
+                  do
+                      cp README.md "$package/README.md"
+                      cp LICENSE.md "$package/LICENSE.md"
+                  done
+
+            - name: Create Package Zip
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  cd "$packagePath"
+                  zip -r "$GITHUB_WORKSPACE/$zipFile" .
+
+            - name: Track Package Meta Files
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  find "$packagePath/" -name '*.meta' > metaList
+
+            - name: Create UnityPackage
+              uses: pCYSl5EDgo/create-unitypackage@v1.2.3
+              with:
+                  package-path: ${{ env.unityPackage }}
+                  include-files: metaList
+
+            - name: Publish Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ env.releaseTag }}
+                  target_commitish: ${{ github.sha }}
+                  name: ${{ env.displayName }} ${{ env.version }}
+                  fail_on_unmatched_files: true
+                  files: |
+                      ${{ env.zipFile }}
+                      ${{ env.unityPackage }}
+                      ${{ env.packagePath }}/package.json

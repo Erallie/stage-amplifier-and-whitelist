@@ -1,0 +1,13 @@
+{
+    "name": "Erallie's Stage Amplifier",
+    "id": "com.erallie.stage-amplifier.listing",
+    "url": "https://erallie.github.io/stage-amplifier-and-whitelist/index.json",
+    "author": {
+        "name": "Erallie",
+        "url": "https://gozarproductions.com"
+    },
+    "description": "Voice amplification and whitelist tools for VRChat worlds.",
+    "githubRepos": [
+        "Erallie/stage-amplifier-and-whitelist"
+    ]
+}
