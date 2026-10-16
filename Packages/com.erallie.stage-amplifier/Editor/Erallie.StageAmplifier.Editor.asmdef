@@ -4,7 +4,9 @@
         "Erallie.StageAmplifier.Runtime",
         "UdonSharp.Runtime",
         "UdonSharp.Editor",
-        "VRC.Udon"
+        "VRC.Udon",
+        "ArchiTech.ProTV.Runtime",
+        "ArchiTech.SDK.Runtime"
     ],
     "includePlatforms": [
         "Editor"
