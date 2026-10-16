@@ -31,6 +31,10 @@ The following credit is sufficient:
 
 > Stage Amplifier and Whitelist by Erallie.
 
+or
+
+> Minimal Amplifier by Erallie
+
 For VRChat worlds, credit may appear in an accessible in-world credits
 panel or the world's public description. For other products, credit
 may appear in a credits screen, accompanying README, or documentation.

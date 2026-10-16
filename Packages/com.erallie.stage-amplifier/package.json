@@ -5,6 +5,9 @@
   "unity": "2022.3",
   "description": "Provides a system with a voice amplifier and whitelist for VRChat worlds that can integrate with ProTV's whitelist in addition to its own.",
   "vrchatVersion": "2022.1.1",
+      "vpmDependencies": {
+        "com.vrchat.worlds": ">=3.10.5"
+    },
   "author": {
     "name": "Erallie",
     "email": "erika@gozarproductions.com",
