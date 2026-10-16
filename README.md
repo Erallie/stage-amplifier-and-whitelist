@@ -21,15 +21,21 @@ See [License and credits](#license-and-credits).
 
 ## Features
 
-- Stage amplification with occupancy and whitelist controls.
-- Microphone pickup amplification.
-- Global amplification for a whitelisted user.
-- Minimal trigger-based amplification without access restrictions.
-- A standalone display-name whitelist.
-- Optional authorization of the first instance master.
-- Optional integration with ProTV authorization.
+- Ear-friendly amplification
+  - It isn't too loud when close
+  - It's easy on the ears
+  - It can still be heard well throughout the world.
+- Multiple forms of amplification
+  - Stage trigger-based amplification based on a whitelist
+  - Microphone pickup amplification
+  - Global amplification for a whitelisted user.
+  - Minimal trigger-based amplification without access restrictions.
+- Whitelist controls.
+  - A standalone display-name whitelist.
+  - Optional authorization of the first instance master.
+  - Can optionally integrate with ProTV's whitelist.
 - Shared object toggles with whitelist-controlled interaction.
-- Optional ownership transfer and object respawning.
+  - Optional ownership transfer and object respawning.
 - Local object and canvas visibility based on whitelist status.
 - Optional control of ProTV's shared volume setting.
 - Custom inspectors with descriptions, field help, and reference search buttons.
@@ -53,40 +59,32 @@ Copy the package into:
 A release package ZIP contains the package's contents. Extract those
 contents into the directory above.
 
-Preserve the included `.meta` files, and avoid installing duplicate
-copies in both `Assets` and `Packages`.
-
 Allow Unity to finish importing and compiling UdonSharp before
 configuring the components.
 
-The package manifest currently does not declare dependency versions.
-Ensure the Worlds SDK, UdonSharp, and Unity UI are installed.
-
 ## Quick setup
 
-These instructions will help you get a minimum viable product into your project. Further customization is required for building your world the way you want it:
+These instructions provide a starting setup. Customize the objects, meshes,
+controls, and appearance for your world.
 
-1. Open **Example Scene Without ProTV**, or add the **Whitelist**
-   and **Stage Amplifier** prefabs to your scene.
-2. Add authorized players' exact VRChat display names to the whitelist.
-3. Optionally enable **Include First Instance Master**.
-4. Assign the same whitelist to the stage and other whitelist-controlled
-   components. Use the **Find** buttons where available.
-5. Assign the stage's **Barrier Collider** and
-   **Teleport On Kick Transform**.
-6. Configure the stage detection collider as a trigger. Use a separate,
-   non-trigger collider as the physical barrier.
-7. Assign **Update Listener** on the whitelist.
-8. On the listener, click **Find and Add Whitelist Listeners**.
-9. Add controls for whitelist-only access or global object toggling
-   as needed.
-10. Test in ClientSim and in a VRChat instance with multiple clients.
+1. Open **Example Scene Without ProTV** (or **Example Scene With ProTV** if using ProTV), or add the **Whitelist** and **Stage Amplifier** prefabs to your scene.
+2. Setup the Whitelist
+  - Add authorized players' exact VRChat display names under `Whitelist`.
+  - If using ProTV, click **Find** next to `Tv Whitelist` under the both the `Whitelist` and the `Whitelist Update Listener` scripts. This will ensure that any player authorized through ProTV's whitelist will also be treated as whitelisted.
+  - Optionally enable **Include First Instance Master**.
+3. Setup the Stage
+  - Configure the stage detection collider as a trigger. Use a separate, non-trigger collider as the physical barrier.
+  - Assign the stage's **Barrier Collider** and **Teleport On Kick Transform**.
+4. Add controls for whitelist-only access or global object toggling as needed.
+5. Setup the Update Listener
+  - Assign **Update Listener** on the whitelist. Use its **Find** button to locate a listener in the current scene.
+  - On the listener, click **Find and Add Whitelist Listeners**. Run this again whenever you add more supported components.
+6. Select the Whitelist component and click **Assign This Whitelist Throughout Scene** to assign it to all serialized Whitelist fields, including those on inactive objects. This replaces existing whitelist assignments and supports Undo with `Ctrl + Z`.
+7. Save the scene, then test in ClientSim and in a VRChat instance
+    with multiple clients.
 
 Copy example scenes into `Assets` before customizing them so package
 updates do not overwrite your changes.
-
-Use **Example Scene With ProTV** when the external ProTV assets are
-installed.
 
 ## Stage access rules
 
@@ -94,28 +92,19 @@ The intended behavior is:
 
 | Stage state | Whitelisted players | Unwhitelisted players |
 | --- | --- | --- |
-| Enabled, normal access, empty | May enter | May enter |
-| Enabled, normal access, occupied | May enter | Blocked unless already the current performer |
-| Enabled, whitelist-only access | May enter | Blocked |
-| Globally off | Blocked | Blocked |
+| Normal access, empty | May enter | May enter |
+| Normal access, occupied | May enter | Blocked unless already the current performer |
+| Whitelist-only access | May enter | Blocked |
 
 Whitelist-only access and global shutdown are separate controls:
 
 - `StageWhitelistToggle` switches the stage's access mode.
 - `WhitelistedToggle` enables or disables its assigned objects.
 
-Global shutdown requires the scene to keep an appropriate physical
-barrier active. Disabling an amplifier stops its trigger logic; it
-does not create a barrier.
-
 The current implementation tracks one `CurrentPerformer` name.
 A whitelisted player may occupy that slot, while other whitelisted
 players bypass the occupancy restriction. There is no separate queue
 of unwhitelisted performers.
-
-**Known issue:** occupied-stage access has been reported to block
-whitelisted players. The rules above describe the intended behavior.
-This documentation update does not resolve that runtime issue.
 
 ## Components
 
@@ -137,12 +126,16 @@ The initial owner name is recorded once through `OnPlayerJoined` by
 the owner of the whitelist object. It is not replaced when the
 instance master changes.
 
-Recording the owner immediately calls the assigned update listener.
-
 Keep the whitelist object enabled. Assign **Update Listener** so
 dependent controls can refresh after initial owner recording.
 Custom scripts that change authorization should also refresh the
 listener.
+
+The **Assign This Whitelist Throughout Scene** inspector button
+assigns this component to all serialized fields of type `Whitelist`
+on MonoBehaviours in the current scene, including inactive objects.
+
+It replaces existing references and supports Undo with `Ctrl + Z`.
 
 ### WhitelistUpdateListener
 
@@ -157,6 +150,7 @@ The **Find and Add Whitelist Listeners** button searches the current
 scene, including inactive objects, for:
 
 - `GlobalAmplifier`
+- `StageAmplifier`
 - `StageWhitelistToggle`
 - `ToggleWhenWhitelisted`
 - `VolumeSyncToggle`
@@ -165,6 +159,9 @@ scene, including inactive objects, for:
 It preserves existing assignments, fills empty slots, and avoids
 adding duplicate references. It searches known component types
 rather than examining arbitrary event names.
+
+Run the button again after adding supported components, then save
+the scene.
 
 ### StageAmplifier
 
@@ -203,7 +200,7 @@ Assign:
 - The linked `StageAmplifier`.
 - Optional mesh visibility and interaction text settings.
 
-Use a collider for in-world interaction.
+Use a trigger collider for in-world interaction.
 
 Interaction takes ownership of the control and linked stage, changes
 their access state, and requests serialization.
@@ -214,13 +211,13 @@ This control does not globally disable the stage.
 
 Amplifies the voice of the player holding the pickup.
 
-Requires `VRCPickup` from `VRC.SDK3.Components`.
+Requires a `VRCPickup` component.
 
 Configure the pickup's collider and Rigidbody as appropriate.
 Dropping the microphone resets voice settings.
 
 The microphone itself does not check whitelist authorization.
-Control its availability through a separate whitelist component
+Control its availability through a separate `Whitelisted Toggle` component
 when needed.
 
 For synchronized movement and respawning through `WhitelistedToggle`,
@@ -231,10 +228,12 @@ place `VRCObjectSync` on the exact GameObject being toggled.
 Lets a whitelisted user interact to amplify their voice wherever
 they move.
 
-Requires a `Collider`.
+Requires a trigger `Collider`.
 
 The object's owner is the amplified player. The owner can switch
 amplification off, and ownership changes also clear amplification.
+
+Each instance of this script in-world supports one amplified user at a time.
 
 **Hide Mesh If Not Whitelisted** optionally hides the control's
 renderer from unauthorized players.
@@ -244,7 +243,7 @@ renderer from unauthorized players.
 Amplifies players inside a trigger without whitelist or occupancy
 restrictions.
 
-Requires a `Collider`, configured as a trigger.
+Requires a trigger `Collider`.
 
 Exiting, respawning, leaving, or disabling the component resets
 voice settings.
@@ -254,7 +253,7 @@ voice settings.
 Lets whitelisted players toggle assigned objects using a shared
 synced state.
 
-Requires a `Collider`.
+Requires a trigger `Collider`.
 
 | Setting | Behavior |
 | --- | --- |
@@ -263,11 +262,20 @@ Requires a `Collider`.
 | Objects To Toggle | Objects enabled or disabled by shared state |
 | Transfer Ownership | Takes ownership of explicitly listed targets |
 | Child Objects | Additional ownership targets |
-| Respawn On Disable | Respawns eligible targets when switching off |
+| Respawn On Disable | Respawns eligible targets when toggled off |
 | Menu Toggle | Optional Unity UI Toggle reflecting shared state |
-| Interaction Text | Text displayed for the on and off states |
+| Customize Interaction Text | Enables state-dependent interaction text |
+| Interact Text When On | Text shown while objects are enabled |
+| Interact Text When Off | Text shown while objects are disabled |
 
 **Child Objects** appears only when **Transfer Ownership** is checked.
+
+**Customize Interaction Text** defaults to unchecked. When unchecked,
+the script leaves the existing interaction text untouched.
+
+When checked, **Interact Text When On** and **Interact Text When Off**
+appear in the inspector. The script selects the appropriate text
+according to the shared toggle state.
 
 Ownership transfer does not automatically discover all descendants.
 Add any additional ownership targets explicitly.
@@ -279,10 +287,7 @@ toggle controller is locally owned.
 Respawning may take ownership of target objects even when
 **Transfer Ownership** is unchecked.
 
-For an optional UI Toggle, connect its value-change event to the
-Udon custom event `OnMenuToggleChanged`.
-
-The displayed toggle state is updated with `SetIsOnWithoutNotify`.
+The `Menu Toggle`'s state is updated with `SetIsOnWithoutNotify` and only called when the objects are toggled.
 
 Initial state comes from the first non-null target's `activeSelf`.
 
@@ -294,16 +299,11 @@ turn the objects back on.
 Shows or hides assigned objects locally according to the local
 player's authorization.
 
-- **Toggle On** checked: objects are enabled for whitelisted players.
-- **Toggle On** unchecked: objects are disabled for whitelisted players.
-
-Assigned canvases are enabled for whitelisted players regardless
-of **Toggle On**.
+- **Toggle On** checked: objects and canvasses are enabled for whitelisted players.
+- **Toggle On** unchecked: objects and canvasses are disabled for whitelisted players.
 
 Keep this component on a separate, always-active controller rather
 than on the whitelist object or an object it disables.
-
-Refreshes use `WhitelistUpdated`.
 
 ### ToggleOthersOnActiveSelf
 
@@ -312,13 +312,11 @@ and disables them when it is disabled.
 
 It performs no whitelist checking or synchronization itself.
 
-Avoid cyclic activation dependencies.
-
 ### VolumeSyncToggle
 
 Lets authorized players change ProTV's shared volume-control setting.
 
-Requires a `Collider`.
+Requires a trigger `Collider`.
 
 With ProTV installed, assign:
 
@@ -343,17 +341,14 @@ Defaults:
 - **Voice Multiplier:** `17`
 - **Starting Volume:** `25`
 
-Despite its label, **Starting Volume** controls the minimum voice
-far distance rather than voice gain.
+**Starting Volume** controls the minimum voice far distance.
 
 Amplification disables voice low-pass filtering.
 
 Resetting restores voice far distance to `25` and re-enables low-pass
 filtering. It does not restore custom settings from another system.
 
-Multiple voice systems affecting the same player can overwrite each
-other's settings. Test combinations of microphones, stages, and
-other voice scripts together.
+Using scripts from other voice amplication systems to amplify the same player can overwrite each other's settings. Test combinations of microphones, stages, and other voice scripts together.
 
 ## ProTV integration
 
@@ -383,44 +378,22 @@ The integration uses:
 The standalone whitelist and first-master option are intended to work
 without ProTV.
 
-The package manifest does not declare ProTV as a required dependency.
-However, the current runtime and editor assembly definitions contain
-direct references to `ArchiTech.ProTV.Runtime` and `ArchiTech.SDK.Runtime`.
-
-Conditional C# guards alone do not confirm a clean import without
-those assemblies. Verify both installation states before publishing.
+ProTV **does not** need to be installed in the project for this package to work.
 
 ProTV and ArchiTech dependencies remain under their own licenses.
-
-## Inspector tools
-
-Custom inspectors provide:
-
-- A large component title.
-- A component description.
-- Help text beneath fields with tooltips.
-- Find buttons for supported scene references.
-- A listener discovery button.
-- Conditional display of Child Objects.
-
-Reference searches include inactive objects in the current scene.
-
-If one match is found, it is assigned automatically. If multiple
-matches are found, a selection menu appears.
-
-Find buttons configure references in the editor; they do not
-automatically repair missing references at runtime.
 
 ## Troubleshooting
 
 | Problem | Check |
 | --- | --- |
-| Whitelisted player blocked by an occupied stage | Confirm the stage's own whitelist assignment and inspect other barrier controllers. The reported regression remains under investigation. |
+| Whitelisted player blocked by an occupied stage | Confirm the stage's whitelist reference, rerun Find and Add Whitelist Listeners from `Whitelist Update Listeners`, and inspect other barrier controllers. |
+| Interaction text does not change with toggle state | Enable Customize Interaction Text and configure both text fields. When disabled, existing interaction text is intentionally left untouched. |
+| Wrong whitelist assigned across the scene | Undo the scene-wide assignment with `Ctrl + Z`, then assign individual references when multiple whitelists are intentional. |
 | Control cannot be used | Check its whitelist reference, exact display name, collider, and listener refresh. |
 | First master not recognized immediately | Check Include First Instance Master, Update Listener, listener assignments, and initialization order. |
 | Player not teleported offstage | Assign Teleport On Kick Transform and confirm the stage trigger is active. |
 | Microphone does not respawn | Enable Respawn On Disable and add VRCObjectSync to the exact toggled object. |
-| ProTV fields missing | Confirm the package ID and assembly version define, then allow Unity to recompile. |
+| ProTV fields missing | Make sure that ProTV is installed in the project, then allow Unity to recompile. |
 | Compile errors after removing ProTV | Inspect both assembly definitions for missing ArchiTech references as well as C# guards. |
 | Different clients see different states | Check ownership, synchronization mode, late joining, and serialization. |
 | Disabled objects cannot be re-enabled | Keep the toggle controller outside the hierarchy it disables. |
