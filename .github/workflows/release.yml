@@ -53,6 +53,13 @@ jobs:
           echo "unityPackage=${{ vars.PACKAGE_NAME }}-${{ steps.version.outputs.value }}.unitypackage" >> $GITHUB_ENV
           echo "version=${{ steps.version.outputs.value }}" >> $GITHUB_ENV
 
+          
+      - name: Copy documentation into package
+        shell: bash
+        run: |
+          cp README.md "${{ env.packagePath }}/README.md"
+          cp LICENSE.md "${{ env.packagePath }}/LICENSE.md"
+          
       # Zip the Package for release
       - name: Create Package Zip
         working-directory: "${{ env.packagePath }}"
