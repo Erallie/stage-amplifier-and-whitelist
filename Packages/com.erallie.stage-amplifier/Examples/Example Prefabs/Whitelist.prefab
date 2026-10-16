@@ -57,6 +57,8 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5283456596229946773}
+  updateListener: {fileID: 8444232748569946018}
+  tvWhitelist: {fileID: 0}
   whitelist:
   - Erallie
   includeFirstInstanceMaster: 1
@@ -108,6 +110,9 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 6803303882998933723}
+  _maxLogLevel: 4
+  _logger: {fileID: 0}
+  tvWhitelist: {fileID: 0}
   listeners: []
 --- !u!114 &6803303882998933723
 MonoBehaviour:

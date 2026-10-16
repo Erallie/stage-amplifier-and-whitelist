@@ -8,6 +8,9 @@ using ArchiTech.ProTV;
 
 public class Whitelist : UdonSharpBehaviour
 {
+    [Tooltip("Set this to the object with the WhitelistUpdateListener script.")]
+    public WhitelistUpdateListener updateListener;
+
 #if ERALLIE_PROTV_PACKAGE
     [Header("Architect TV Whitelist")]
     [Tooltip("The TVManagedWhitelist component used by Architect's TV.")]
@@ -33,6 +36,11 @@ public class Whitelist : UdonSharpBehaviour
         if (string.IsNullOrEmpty(owner) && Networking.IsOwner(gameObject))
         {
             owner = player.displayName;
+
+            if (updateListener != null)
+            {
+                updateListener.UpdateUI();
+            }
         }
     }
 

@@ -107,7 +107,8 @@ namespace Erallie.StageAmplifierInspectors
             if (property.propertyType != SerializedPropertyType.ObjectReference ||
                 (property.propertyPath != "whitelist" &&
                  property.propertyPath != "tvWhitelist" &&
-                 property.propertyPath != "tvManager"))
+                 property.propertyPath != "tvManager" &&
+                 property.propertyPath != "updateListener"))
             {
                 return null;
             }
