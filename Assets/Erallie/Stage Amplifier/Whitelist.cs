@@ -1,13 +1,14 @@
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
-#if ERALLIE_PROTV
+
+#if ERALLIE_PROTV_PACKAGE
 using ArchiTech.ProTV;
 #endif
 
 public class Whitelist : UdonSharpBehaviour
 {
-#if ERALLIE_PROTV
+#if ERALLIE_PROTV_PACKAGE
     [Header("Architect TV Whitelist")]
     [Tooltip("The TVManagedWhitelist component used by Architect's TV.")]
     public TVManagedWhitelist tvWhitelist;
@@ -23,7 +24,6 @@ public class Whitelist : UdonSharpBehaviour
     [UdonSynced]
     private string owner;
 
-
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
         if (string.IsNullOrEmpty(owner) && Networking.IsOwner(gameObject))
@@ -32,7 +32,8 @@ public class Whitelist : UdonSharpBehaviour
         }
     }
 
-    public bool IsOwner(VRCPlayerApi player) {
+    public bool IsOwner(VRCPlayerApi player)
+    {
         return player.displayName == owner;
     }
 
@@ -43,8 +44,7 @@ public class Whitelist : UdonSharpBehaviour
             return false;
         }
 
-#if ERALLIE_PROTV
-        // Architect's authorized users and explicit super users.
+#if ERALLIE_PROTV_PACKAGE
         if (Utilities.IsValid(tvWhitelist))
         {
             if (tvWhitelist._IsAuthorizedUser(player) ||
@@ -53,9 +53,8 @@ public class Whitelist : UdonSharpBehaviour
                 return true;
             }
         }
-
 #endif
-        // Our additional whitelist.
+
         if (whitelist != null)
         {
             string playerName = player.displayName;
@@ -69,7 +68,6 @@ public class Whitelist : UdonSharpBehaviour
             }
         }
 
-        // Optionally authorize the first instance master.
         if (includeFirstInstanceMaster)
         {
             return IsOwner(player);

@@ -9,9 +9,6 @@
     "com.vrchat.worlds": {
       "version": "3.10.5"
     },
-    "com.vrchat.base": {
-      "version": "3.10.5"
-    },
     "dev.architech.sdk": {
       "version": "0.23.0"
     },
@@ -23,9 +20,6 @@
     },
     "dev.architech.protv.extras": {
       "version": "0.9.3-beta"
-    },
-    "dev.architech.protv": {
-      "version": "3.0.0-beta.31"
     }
   },
   "locked": {

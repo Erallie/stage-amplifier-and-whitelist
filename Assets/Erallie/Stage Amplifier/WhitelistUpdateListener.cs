@@ -1,16 +1,17 @@
-#if ERALLIE_PROTV
+#if ERALLIE_PROTV_PACKAGE
 using ArchiTech.ProTV;
 #endif
+
 using UdonSharp;
 using UnityEngine;
 
-#if ERALLIE_PROTV
+#if ERALLIE_PROTV_PACKAGE
 public class WhitelistUpdateListener : TVPluginUI
 #else
 public class WhitelistUpdateListener : UdonSharpBehaviour
 #endif
 {
-#if ERALLIE_PROTV
+#if ERALLIE_PROTV_PACKAGE
     [Header("Architect TV Whitelist")]
     [Tooltip("The TVManagedWhitelist component whose whitelist changes we want to listen for.")]
     public TVManagedWhitelist tvWhitelist;
@@ -20,14 +21,13 @@ public class WhitelistUpdateListener : UdonSharpBehaviour
     [Tooltip("UdonSharp behaviours that should receive WhitelistUpdated whenever the whitelist changes.")]
     public UdonSharpBehaviour[] listeners;
 
-
-#if ERALLIE_PROTV
+#if ERALLIE_PROTV_PACKAGE
     public override void Start()
 #else
     private void Start()
 #endif
     {
-#if ERALLIE_PROTV
+#if ERALLIE_PROTV_PACKAGE
         if (init)
         {
             return;
@@ -39,13 +39,12 @@ public class WhitelistUpdateListener : UdonSharpBehaviour
         {
             tvWhitelist._RegisterListener(this);
         }
-
 #endif
+
         RefreshListeners();
     }
 
-
-#if ERALLIE_PROTV
+#if ERALLIE_PROTV_PACKAGE
     public override void UpdateUI()
 #else
     public void UpdateUI()
@@ -53,7 +52,6 @@ public class WhitelistUpdateListener : UdonSharpBehaviour
     {
         RefreshListeners();
     }
-
 
     private void RefreshListeners()
     {

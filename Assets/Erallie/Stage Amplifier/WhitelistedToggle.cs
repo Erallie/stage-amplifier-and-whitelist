@@ -1,130 +1,260 @@
-﻿
-using System.Collections.Generic;
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
+using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.SDK3.Components;
-using VRC.Udon;
 
 public class WhitelistedToggle : UdonSharpBehaviour
 {
-    [Tooltip("Set this to the game object that contains the Whitelist script.")]
+    [Header("Access")]
+    [Tooltip("The whitelist that authorizes this control. Without a whitelist, interaction is disabled.")]
     public Whitelist whitelist;
-    // private VRCPlayerApi localPlayer;
 
+    [Tooltip("Hide this object's Mesh Renderer from players who are not whitelisted.")]
+    public bool hideMeshIfNotWhitelisted;
 
-    [Tooltip("Add the objects that you want to toggle on and off.")]
-    public GameObject[] objectsToToggle;
-
-    [Tooltip("Add any of the toggled object's children that have udon behaviors.")]
-    public GameObject[] childObjects;
-
-    [Tooltip("A list of canvases to hide for unwhitelisted people.")]
+    [Tooltip("Optional canvases to hide from players who are not whitelisted.")]
     public Canvas[] hiddenCanvases;
 
-    [Tooltip("If this option is enabled, the objects will be respawned whenever they are toggled on.")]
+    [Header("Objects")]
+    [Tooltip("Objects to enable or disable for everyone. The first assigned object supplies the initial state. Keep this controller outside these objects so it remains active.")]
+    public GameObject[] objectsToToggle;
+
+    [Tooltip("Transfer ownership of the listed objects and additional child objects to the player using the control. Disable this if ownership should remain unchanged.")]
+    public bool transferOwnership = true;
+
+    [Tooltip("Optional additional objects whose ownership should be transferred, such as children containing Udon behaviours.")]
+    public GameObject[] childObjects;
+
+    [InspectorName("Respawn On Disable")]
+    [Tooltip("Respawn toggled objects with VRC Object Sync when switching them off. The field's original name is preserved to retain existing Inspector assignments.")]
     public bool respawnOnEnable;
 
-    [Tooltip("If this option is enabled, this object will not be rendered for people who are not whitelisted.")]
-    public bool hideMeshIfNotWhitelisted;
+    [Header("Optional UI")]
+    [Tooltip("Optional UI toggle that displays the shared state. Its value is updated without firing On Value Changed. To control this script from the toggle, connect that event to OnMenuToggleChanged.")]
+    public Toggle menuToggle;
+
+    [Tooltip("Interaction text displayed while the objects are on.")]
+    public string interactTextWhenOn = "Turn Off Globally";
+
+    [Tooltip("Interaction text displayed while the objects are off.")]
+    public string interactTextWhenOff = "Turn On Globally";
 
     [UdonSynced, FieldChangeCallback(nameof(ToggledOn))]
     private bool _toggledOn;
 
-    private VRCObjectSync[] objectSyncs;
+    private bool initialized;
 
-
-    void Start()
+    public bool ToggledOn
     {
-        if (!respawnOnEnable)
-        {
-            return;
-        }
+        get => _toggledOn;
 
-        int count = 0;
-
-        foreach (GameObject toggleObj in objectsToToggle)
+        set
         {
-            if (toggleObj.GetComponent<VRCObjectSync>() != null)
+            bool changed = _toggledOn != value;
+
+            _toggledOn = value;
+            initialized = true;
+
+            ApplyState();
+
+            if (changed &&
+                !value &&
+                respawnOnEnable &&
+                Networking.IsOwner(gameObject))
             {
-                count++;
-            }
-        }
-
-        objectSyncs = new VRCObjectSync[count];
-
-        int index = 0;
-        foreach (GameObject toggleObj in objectsToToggle)
-        {
-            VRCObjectSync sync = toggleObj.GetComponent<VRCObjectSync>();
-            if (sync != null)
-            {
-                objectSyncs[index++] = sync;
+                RespawnObjects();
             }
         }
     }
 
+    public bool GlobalOn
+    {
+        get => ToggledOn;
+        set => ToggledOn = value;
+    }
 
-    void OnEnable() {
+    private void OnEnable()
+    {
+        if (!initialized)
+        {
+            if (objectsToToggle != null)
+            {
+                foreach (GameObject toggleObj in objectsToToggle)
+                {
+                    if (toggleObj != null)
+                    {
+                        _toggledOn = toggleObj.activeSelf;
+                        break;
+                    }
+                }
+            }
+
+            initialized = true;
+        }
+
         WhitelistUpdated();
-        _toggledOn = objectsToToggle[0].activeInHierarchy;
+        ApplyState();
     }
 
     public void WhitelistUpdated()
     {
-        bool onWhitelist = whitelist.IsOnWhitelist(Networking.LocalPlayer);
-        this.GetComponent<Collider>().enabled = onWhitelist;
-        if (hideMeshIfNotWhitelisted) {
-            this.GetComponent<MeshRenderer>().enabled = onWhitelist;
-        }
-        
-        if (hiddenCanvases.Length != 0) {
-            foreach (Canvas canvas in hiddenCanvases) {
-                canvas.enabled = onWhitelist;
-            }
-        }
-    }
+        bool onWhitelist = CanUseControl();
 
-    public override void Interact() {
-        // localPlayer = Networking.LocalPlayer;
-        bool isOn = objectsToToggle[0].activeSelf;
-        Networking.SetOwner(Networking.LocalPlayer, this.gameObject);
-        ToggledOn = !isOn;
-    }
+        Collider controlCollider = GetComponent<Collider>();
 
-    public bool ToggledOn
-    {
-        set
+        if (controlCollider != null)
         {
-            _toggledOn = value;
-            
-            VRCPlayerApi owner = Networking.GetOwner(this.gameObject);
-            
-            if (objectsToToggle.Length != 0) {
-                foreach (GameObject toggleObj in objectsToToggle) {
-                    toggleObj.SetActive(value);
-                    Networking.SetOwner(owner, toggleObj);
-                }
-            }
-
-            if (childObjects.Length != 0) {
-                // Debug.Log(childObjects.Length);
-                foreach (GameObject thisObj in childObjects) {
-                    Networking.SetOwner(owner, thisObj);
-                }
-            }
-            
-            if (respawnOnEnable && value == false && objectsToToggle.Length != 0 && Networking.IsOwner(this.gameObject)) {
-                foreach (GameObject toggleObj2 in objectsToToggle) {
-                    VRCObjectSync sync = toggleObj2.GetComponent<VRCObjectSync>();
-                    if (sync == null) {
-                        continue;
-                    }
-                    sync.Respawn();
-                }
-            }
-
+            controlCollider.enabled = onWhitelist;
         }
-        get => _toggledOn;
+
+        if (hideMeshIfNotWhitelisted)
+        {
+            MeshRenderer controlMesh = GetComponent<MeshRenderer>();
+
+            if (controlMesh != null)
+            {
+                controlMesh.enabled = onWhitelist;
+            }
+        }
+
+        if (hiddenCanvases != null)
+        {
+            foreach (Canvas canvas in hiddenCanvases)
+            {
+                if (canvas != null)
+                {
+                    canvas.enabled = onWhitelist;
+                }
+            }
+        }
+
+        if (menuToggle != null)
+        {
+            menuToggle.interactable = onWhitelist;
+        }
+    }
+
+    public override void Interact()
+    {
+        SetSharedState(!ToggledOn);
+    }
+
+    public void OnMenuToggleChanged()
+    {
+        if (menuToggle != null)
+        {
+            SetSharedState(menuToggle.isOn);
+        }
+    }
+
+    private bool CanUseControl()
+    {
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+
+        return Utilities.IsValid(localPlayer) &&
+            whitelist != null &&
+            whitelist.IsOnWhitelist(localPlayer);
+    }
+
+    private void SetSharedState(bool value)
+    {
+        if (!CanUseControl())
+        {
+            UpdateUI();
+            return;
+        }
+
+        if (value == ToggledOn)
+        {
+            UpdateUI();
+            return;
+        }
+
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+
+        Networking.SetOwner(localPlayer, gameObject);
+
+        if (!Networking.IsOwner(gameObject))
+        {
+            UpdateUI();
+            return;
+        }
+
+        if (transferOwnership || (respawnOnEnable && !value))
+        {
+            TakeObjectOwnership(objectsToToggle, localPlayer);
+        }
+
+        if (transferOwnership)
+        {
+            TakeObjectOwnership(childObjects, localPlayer);
+        }
+
+        ToggledOn = value;
+    }
+
+    private void TakeObjectOwnership(
+        GameObject[] objects,
+        VRCPlayerApi player)
+    {
+        if (objects != null)
+        {
+            foreach (GameObject obj in objects)
+            {
+                if (obj != null)
+                {
+                    Networking.SetOwner(player, obj);
+                }
+            }
+        }
+    }
+
+    private void ApplyState()
+    {
+        if (objectsToToggle != null)
+        {
+            foreach (GameObject toggleObj in objectsToToggle)
+            {
+                if (toggleObj != null)
+                {
+                    toggleObj.SetActive(_toggledOn);
+                }
+            }
+        }
+
+        UpdateUI();
+    }
+
+    private void UpdateUI()
+    {
+        InteractionText = _toggledOn
+            ? interactTextWhenOn
+            : interactTextWhenOff;
+
+        if (menuToggle != null)
+        {
+            menuToggle.SetIsOnWithoutNotify(_toggledOn);
+        }
+    }
+
+    private void RespawnObjects()
+    {
+        if (objectsToToggle != null)
+        {
+            foreach (GameObject toggleObj in objectsToToggle)
+            {
+                if (toggleObj != null && Networking.IsOwner(toggleObj))
+                {
+                    VRCObjectSync sync =
+                        toggleObj.GetComponent<VRCObjectSync>();
+
+                    if (sync != null)
+                    {
+                        sync.Respawn();
+                    }
+                }
+            }
+        }
     }
 }
