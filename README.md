@@ -169,7 +169,7 @@ the scene.
 
 Amplifies players inside its trigger and manages stage access.
 
-Requires a `Collider`. Configure the detection collider as a trigger.
+Requires a trigger `Collider`.
 
 | Setting | Purpose |
 | --- | --- |
