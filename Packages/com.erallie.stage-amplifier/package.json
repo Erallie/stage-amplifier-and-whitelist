@@ -3,7 +3,7 @@
   "displayName": "Stage Amplifier and Whitelist",
   "version": "0.0.8",
   "unity": "2022.3",
-  "description": "Provides a system with a voice amplifier and whitelist for VRChat worlds that can integrate with ProTV's whitelist in addition to its own.",
+  "description": "Provides a system with a voice amplifier and whitelist for VRChat worlds that is easy on the ears, doesn't get too loud, and can still be heard well globally.",
   "vrchatVersion": "2022.1.1",
       "vpmDependencies": {
         "com.vrchat.worlds": ">=3.10.5"
