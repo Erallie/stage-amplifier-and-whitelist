@@ -16,6 +16,8 @@ Voice amplification, stage access controls, and whitelist tools for
 Use the standalone whitelist or optionally connect it to ArchiTech's
 ProTV whitelist.
 
+Comes with a [Minimal Amplifier](#MinimalAmplifier) package in the VCC listing if you only want the amplifier with no extra settings.
+
 **Free for personal and commercial use with credit to Erallie.**
 See [License and credits](#license-and-credits).
 
@@ -69,16 +71,16 @@ controls, and appearance for your world.
 
 1. Open **Example Scene Without ProTV** (or **Example Scene With ProTV** if using ProTV), or add the **Whitelist** and **Stage Amplifier** prefabs to your scene.
 2. Setup the Whitelist
-  - Add authorized players' exact VRChat display names under `Whitelist`.
-  - If using ProTV, click **Find** next to `Tv Whitelist` under the both the `Whitelist` and the `Whitelist Update Listener` scripts. This will ensure that any player authorized through ProTV's whitelist will also be treated as whitelisted.
-  - Optionally enable **Include First Instance Master**.
+    - Add authorized players' exact VRChat display names under `Whitelist`.
+    - If using ProTV, click **Find** next to `Tv Whitelist` under the both the `Whitelist` and the `Whitelist Update Listener` scripts. This will ensure that any player authorized through ProTV's whitelist will also be treated as whitelisted.
+    - Optionally enable **Include First Instance Master**.
 3. Setup the Stage
-  - Configure the stage detection collider as a trigger. Use a separate, non-trigger collider as the physical barrier.
-  - Assign the stage's **Barrier Collider** and **Teleport On Kick Transform**.
+    - Configure the stage detection collider as a trigger. Use a separate, non-trigger collider as the physical barrier.
+    - Assign the stage's **Barrier Collider** and **Teleport On Kick Transform**.
 4. Add controls for whitelist-only access or global object toggling as needed.
 5. Setup the Update Listener
-  - Assign **Update Listener** on the whitelist. Use its **Find** button to locate a listener in the current scene.
-  - On the listener, click **Find and Add Whitelist Listeners**. Run this again whenever you add more supported components.
+    - Assign **Update Listener** on the whitelist. Use its **Find** button to locate a listener in the current scene.
+    - On the listener, click **Find and Add Whitelist Listeners**. Run this again whenever you add more supported components.
 6. Select the Whitelist component and click **Assign This Whitelist Throughout Scene** to assign it to all serialized Whitelist fields, including those on inactive objects. This replaces existing whitelist assignments and supports Undo with `Ctrl + Z`.
 7. Save the scene, then test in ClientSim and in a VRChat instance
     with multiple clients.
@@ -167,7 +169,7 @@ the scene.
 
 Amplifies players inside its trigger and manages stage access.
 
-Requires a `Collider`. Configure the detection collider as a trigger.
+Requires a trigger `Collider`.
 
 | Setting | Purpose |
 | --- | --- |
@@ -178,6 +180,8 @@ Requires a `Collider`. Configure the detection collider as a trigger.
 | Canvas To Hide | Optional canvas hidden for the local performer |
 | Voice Multiplier | Voice-distance multiplier; default `17` |
 | Starting Volume | Minimum voice far distance; default `25` |
+| Limit Amplification Range | Whether to stop amplification past a certain distance |
+| Limit Distance | Distance where amplification stops |
 
 `WhitelistOnly` selects the access mode.
 
@@ -330,6 +334,10 @@ no effect on a TV system.
 
 ## Voice settings
 
+The amplifiers feature a unique way of boosting your voice that's easy on the ears, not too loud when up close, and still heard well throughout the world.
+
+They do this by adjusting the voice falloff range according to the distance between you and the person being amplified.
+
 The amplifiers calculate voice far distance using:
 
 ```text
@@ -351,6 +359,8 @@ filtering. It does not restore custom settings from another system.
 Using scripts from other voice amplication systems to amplify the same player can overwrite each other's settings. Test combinations of microphones, stages, and other voice scripts together.
 
 ## ProTV integration
+
+You can integrate with ProTV's whitelist so that when you authorize users in-world in ProTV's whitelist, they are also treated as whitelisted by the stage amplifier and other toggles.
 
 ProTV-specific code is guarded by:
 
