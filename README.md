@@ -16,7 +16,7 @@ Voice amplification, stage access controls, and whitelist tools for
 Use the standalone whitelist or optionally connect it to ArchiTech's
 ProTV whitelist.
 
-Comes with a [Minimal Amplifier](#MinimalAmplifier) package if you only want the amplifier with no extra settings.
+Comes with a [Minimal Amplifier](#MinimalAmplifier) package in the VCC listing if you only want the amplifier with no extra settings.
 
 **Free for personal and commercial use with credit to Erallie.**
 See [License and credits](#license-and-credits).
