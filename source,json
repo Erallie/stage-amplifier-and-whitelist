@@ -6,7 +6,8 @@
         "name": "Erallie",
         "url": "https://gozarproductions.com"
     },
-    "description": "Voice amplification and whitelist tools for VRChat worlds.",
+    "description": "A voice amplifier and whitelist system that's easy on the ears, doesn't get too loud, and can still be heard well globally.",
+    "bannerUrl": "banner.png",
     "githubRepos": [
         "Erallie/stage-amplifier-and-whitelist"
     ]
