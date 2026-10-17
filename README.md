@@ -180,6 +180,8 @@ Requires a `Collider`. Configure the detection collider as a trigger.
 | Canvas To Hide | Optional canvas hidden for the local performer |
 | Voice Multiplier | Voice-distance multiplier; default `17` |
 | Starting Volume | Minimum voice far distance; default `25` |
+| Limit Amplification Range | Whether to stop amplification past a certain distance |
+| Limit Distance | Distance where amplification stops |
 
 `WhitelistOnly` selects the access mode.
 
