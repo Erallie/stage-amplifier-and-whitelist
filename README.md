@@ -354,6 +354,8 @@ Using scripts from other voice amplication systems to amplify the same player ca
 
 ## ProTV integration
 
+You can integrate with ProTV's whitelist so that when you authorize users in-world in ProTV's whitelist, they are also treated as whitelisted by the stage amplifier and other toggles.
+
 ProTV-specific code is guarded by:
 
 `ERALLIE_PROTV_PACKAGE`
