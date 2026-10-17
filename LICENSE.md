@@ -6,7 +6,7 @@ Copyright (c) 2026 Erallie.
 
 This license applies to the original code, documentation, models, prefabs,
 scenes, and other assets authored and owned by Erallie for Stage Amplifier
-and Whitelist (the "Material").
+and Whitelist and Minimal Amplifier (the "Material").
 
 Third-party dependencies and materials remain under their respective
 licenses. This license does not grant rights to material Erallie does
