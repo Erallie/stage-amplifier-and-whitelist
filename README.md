@@ -71,16 +71,16 @@ controls, and appearance for your world.
 
 1. Open **Example Scene Without ProTV** (or **Example Scene With ProTV** if using ProTV), or add the **Whitelist** and **Stage Amplifier** prefabs to your scene.
 2. Setup the Whitelist
-  - Add authorized players' exact VRChat display names under `Whitelist`.
-  - If using ProTV, click **Find** next to `Tv Whitelist` under the both the `Whitelist` and the `Whitelist Update Listener` scripts. This will ensure that any player authorized through ProTV's whitelist will also be treated as whitelisted.
-  - Optionally enable **Include First Instance Master**.
+    - Add authorized players' exact VRChat display names under `Whitelist`.
+    - If using ProTV, click **Find** next to `Tv Whitelist` under the both the `Whitelist` and the `Whitelist Update Listener` scripts. This will ensure that any player authorized through ProTV's whitelist will also be treated as whitelisted.
+    - Optionally enable **Include First Instance Master**.
 3. Setup the Stage
-  - Configure the stage detection collider as a trigger. Use a separate, non-trigger collider as the physical barrier.
-  - Assign the stage's **Barrier Collider** and **Teleport On Kick Transform**.
+    - Configure the stage detection collider as a trigger. Use a separate, non-trigger collider as the physical barrier.
+    - Assign the stage's **Barrier Collider** and **Teleport On Kick Transform**.
 4. Add controls for whitelist-only access or global object toggling as needed.
 5. Setup the Update Listener
-  - Assign **Update Listener** on the whitelist. Use its **Find** button to locate a listener in the current scene.
-  - On the listener, click **Find and Add Whitelist Listeners**. Run this again whenever you add more supported components.
+    - Assign **Update Listener** on the whitelist. Use its **Find** button to locate a listener in the current scene.
+    - On the listener, click **Find and Add Whitelist Listeners**. Run this again whenever you add more supported components.
 6. Select the Whitelist component and click **Assign This Whitelist Throughout Scene** to assign it to all serialized Whitelist fields, including those on inactive objects. This replaces existing whitelist assignments and supports Undo with `Ctrl + Z`.
 7. Save the scene, then test in ClientSim and in a VRChat instance
     with multiple clients.
