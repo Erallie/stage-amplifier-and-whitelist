@@ -47,7 +47,7 @@ Companion, with the Worlds SDK and UdonSharp available.
 
 ### Through VCC
 
-Add the the listing to VCC [here](https://erallie.github.io/stage-amplifier-and-whitelist/), then add
+Add the the listing to VCC [here](https://vcc.gozarproductions.com/), then add
 **Stage Amplifier and Whitelist** to your world project.
 
 ### Manual installation
