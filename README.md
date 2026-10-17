@@ -332,6 +332,10 @@ no effect on a TV system.
 
 ## Voice settings
 
+The amplifiers feature a unique way of boosting your voice that's easy on the ears, not too loud when up close, and still heard well throughout the world.
+
+They do this by adjusting the voice falloff range according to the distance between you and the person being amplified.
+
 The amplifiers calculate voice far distance using:
 
 ```text
