@@ -1,7 +1,7 @@
 {
   "name": "com.erallie.stage-amplifier",
   "displayName": "Stage Amplifier and Whitelist",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "unity": "2022.3",
   "description": "A system with a voice amplifier and whitelist for VRChat worlds that is easy on the ears, doesn't get too loud, and can still be heard well globally. Can integrate with ProTV's whitelist.",
   "vrchatVersion": "2022.1.1",
