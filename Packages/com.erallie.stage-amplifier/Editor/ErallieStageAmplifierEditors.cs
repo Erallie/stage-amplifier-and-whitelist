@@ -39,6 +39,17 @@ namespace Erallie.StageAmplifierInspectors
             EditorGUILayout.LabelField(Description, descriptionStyle);
             EditorGUILayout.Space(4);
 
+            var packageInfo =
+                UnityEditor.PackageManager.PackageInfo.FindForAssembly(
+                    target.GetType().Assembly);
+
+            if (packageInfo != null)
+            {
+                EditorGUILayout.LabelField(
+                    "Version " + packageInfo.version,
+                    EditorStyles.miniLabel);
+            }
+
             if (EditorGUILayout.LinkButton(
                 "View on GitHub",
                 GUILayout.ExpandWidth(false)))
