@@ -32,6 +32,16 @@ namespace Erallie.MinimalAmplifierInspectors
                 "Amplifies players while they are inside this object's trigger.",
                 descriptionStyle);
 
+            EditorGUILayout.Space(4);
+
+            if (EditorGUILayout.LinkButton(
+                "View on GitHub",
+                GUILayout.ExpandWidth(false)))
+            {
+                Application.OpenURL(
+                    "https://github.com/Erallie/stage-amplifier-and-whitelist");
+            }
+
             EditorGUILayout.Space(12);
 
             if (UdonSharpGUI.DrawDefaultUdonSharpBehaviourHeader(targets))

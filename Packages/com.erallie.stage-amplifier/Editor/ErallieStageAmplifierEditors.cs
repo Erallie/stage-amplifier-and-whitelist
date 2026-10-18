@@ -37,6 +37,16 @@ namespace Erallie.StageAmplifierInspectors
 
             EditorGUILayout.Space(4);
             EditorGUILayout.LabelField(Description, descriptionStyle);
+            EditorGUILayout.Space(4);
+
+            if (EditorGUILayout.LinkButton(
+                "View on GitHub",
+                GUILayout.ExpandWidth(false)))
+            {
+                Application.OpenURL(
+                    "https://github.com/Erallie/stage-amplifier-and-whitelist");
+            }
+
             EditorGUILayout.Space(12);
 
             if (UdonSharpGUI.DrawDefaultUdonSharpBehaviourHeader(targets))
