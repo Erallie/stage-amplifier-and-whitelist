@@ -10,8 +10,7 @@
 
 ---
 
-Voice amplification, stage access controls, and whitelist tools for
-**VRChat worlds**, created by **Erallie**.
+A system with a voice amplifier and whitelist for VRChat worlds that is easy on the ears, doesn't get too loud, and can still be heard well globally.
 
 Use the standalone whitelist or optionally connect it to ArchiTech's
 ProTV whitelist.
