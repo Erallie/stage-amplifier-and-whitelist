@@ -5,9 +5,9 @@
   "unity": "2022.3",
   "description": "Provides a system with a voice amplifier and whitelist for VRChat worlds that is easy on the ears, doesn't get too loud, and can still be heard well globally.",
   "vrchatVersion": "2022.1.1",
-      "vpmDependencies": {
-        "com.vrchat.worlds": ">=3.10.5"
-    },
+  "vpmDependencies": {
+    "com.vrchat.worlds": ">=3.10.5"
+  },
   "author": {
     "name": "Erallie",
     "email": "erika@gozarproductions.com",
