@@ -74,25 +74,25 @@ namespace Erallie.StageAmplifierInspectors
             AddPrefab(PrefabRoot + "Toggles/Whitelist Toggle.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "/Examples/Microphone Example Prefab", false, 24)]
+        [MenuItem(AddToSceneRoot + "/Microphone Example Prefab", false, 50)]
         private static void AddMicrophone()
         {
             AddPrefab(PrefabRoot + "Microphone.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "/Examples/Stage Amplifier Example Prefab", false, 25)]
+        [MenuItem(AddToSceneRoot + "/Stage Amplifier Example Prefab", false, 51)]
         private static void AddStageAmplifier()
         {
             AddPrefab(PrefabRoot + "Stage Amplifier.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Microphone Toggle Example", false, 26)]
+        [MenuItem(AddToSceneRoot + "/Whitelisted Toggle Examples/Microphone Toggle Example", false, 52)]
         private static void AddMicrophoneToggle()
         {
             AddPrefab(PrefabRoot + "/Toggles/Whitelisted Toggle Examples/Microphone Toggle.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Stage Toggle Example", false, 27)]
+        [MenuItem(AddToSceneRoot + "/Whitelisted Toggle Examples/Stage Toggle Example", false, 53)]
         private static void AddStageToggle()
         {
             AddPrefab(PrefabRoot + "/Toggles/Whitelisted Toggle Examples/Stage Toggle.prefab");
@@ -136,10 +136,10 @@ namespace Erallie.StageAmplifierInspectors
         [MenuItem(AddToSceneRoot + "Add Toggle When Whitelisted Script to Scene", true)]
         [MenuItem(AddToSceneRoot + "Add Global Amplifier Toggle to Scene", true)]
         [MenuItem(AddToSceneRoot + "Add Whitelist Toggle to Scene", true)]
-        [MenuItem(AddToSceneRoot + "/Examples/Add Microphone Example Prefab to Scene", true)]
-        [MenuItem(AddToSceneRoot + "/Examples/Add Stage Amplifier Example Prefab to Scene", true)]
-        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Add Microphone Toggle Example to Scene", true)]
-        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Add Stage Toggle Example to Scene", true)]
+        [MenuItem(AddToSceneRoot + "/Microphone Example Prefab", true)]
+        [MenuItem(AddToSceneRoot + "/Stage Amplifier Example Prefab", true)]
+        [MenuItem(AddToSceneRoot + "/Whitelisted Toggle Examples/Add Microphone Toggle Example to Scene", true)]
+        [MenuItem(AddToSceneRoot + "/Whitelisted Toggle Examples/Add Stage Toggle Example to Scene", true)]
         private static bool ValidateCommonMenuItems()
         {
             return CanUseSceneMenu();
