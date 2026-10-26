@@ -7,7 +7,7 @@ on:
                 description: Package to release
                 required: true
                 type: choice
-                default: com.erallie.minimal-amplifier
+                default: com.erallie.stage-amplifier
                 options:
                     - com.erallie.stage-amplifier
                     - com.erallie.minimal-amplifier
@@ -120,3 +120,25 @@ jobs:
                       ${{ env.zipFile }}
                       ${{ env.unityPackage }}
                       ${{ env.packagePath }}/package.json
+
+    update-listing:
+        name: Trigger VCC listing rebuild
+        needs: build
+        runs-on: ubuntu-latest
+        permissions: {}
+        steps:
+            - name: Dispatch listing workflow
+              env:
+                  GH_TOKEN: ${{ secrets.VCC_LISTING_TOKEN }}
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  if [ -z "$GH_TOKEN" ]; then
+                      echo "::error::Add the VCC_LISTING_TOKEN repository secret with Actions write access to Erallie/vcc-listing."
+                      exit 1
+                  fi
+
+                  gh workflow run build-listing.yml \
+                      --repo Erallie/vcc-listing \
+                      --ref main
