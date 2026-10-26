@@ -115,16 +115,19 @@ namespace Erallie.StageAmplifierInspectors
                         continue;
                     }
                 }
-                if (property.propertyPath == "txlAccessBridge" &&
-                    FindBridgeType("TXLWhitelistBridge") == null)
+#if !ERALLIE_ACCESSTXL_PACKAGE
+                if (property.propertyPath == "txlAccessBridge")
                 {
                     continue;
                 }
-                if (property.propertyPath == "proTVAccessBridge" &&
-                    FindBridgeType("ProTVWhitelistBridge") == null)
+#endif
+
+#if !ERALLIE_PROTV_PACKAGE
+                if (property.propertyPath == "proTVAccessBridge")
                 {
                     continue;
                 }
+#endif
                 Type referenceType = GetReferenceSearchType(property);
                 bool isFindableReference = referenceType != null;
 
