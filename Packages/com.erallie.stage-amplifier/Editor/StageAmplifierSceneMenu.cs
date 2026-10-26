@@ -8,6 +8,7 @@ namespace Erallie.StageAmplifierInspectors
 {
     public static class StageAmplifierSceneMenu
     {
+
         private const string MenuRoot =
             "Tools/Erallie/Stage Amplifier and Whitelist/";
             
@@ -17,17 +18,22 @@ namespace Erallie.StageAmplifierInspectors
         private const string OpenSceneRoot = 
             MenuRoot + "Open Example Scene/";
 
-        private const string PrefabRoot =
-            "Packages/com.erallie.stage-amplifier/Examples/Example Prefabs/";
+        
+        private const string ExamplesRoot = "Packages/com.erallie.stage-amplifier/Examples/";
 
-        [MenuItem(AddToSceneRoot + "Add Whitelist Script to Scene", false, 0)]
+        private const string SceneRoot = ExamplesRoot + "Example Scenes/";
+
+        private const string PrefabRoot =
+            ExamplesRoot + "Example Prefabs/";
+
+        [MenuItem(AddToSceneRoot + "Whitelist Script", false, 0)]
         private static void AddWhitelist()
         {
             AddPrefab(PrefabRoot + "Whitelist.prefab");
         }
 
 #if ERALLIE_ACCESSTXL_PACKAGE
-        [MenuItem(AddToSceneRoot + "Add AccessTXL Whitelist Bridge to Scene", false, 1)]
+        [MenuItem(AddToSceneRoot + "AccessTXL Whitelist Bridge", false, 1)]
         private static void AddTXLBridge()
         {
             AddPrefab(PrefabRoot + "Integrations/AccessTXL Whitelist Bridge.prefab");
@@ -35,61 +41,159 @@ namespace Erallie.StageAmplifierInspectors
 #endif
 
 #if ERALLIE_PROTV_PACKAGE
-        [MenuItem(AddToSceneRoot + "Add ProTV Whitelist Bridge to Scene", false, 2)]
+        [MenuItem(AddToSceneRoot + "ProTV Whitelist Bridge", false, 2)]
         private static void AddProTVBridge()
         {
             AddPrefab(PrefabRoot + "Integrations/ProTV Whitelist Bridge.prefab");
         }
 #endif
 
-        [MenuItem(AddToSceneRoot + "Add Toggle When Whitelisted Script to Scene", false, 20)]
+        [MenuItem(AddToSceneRoot + "Toggle When Whitelisted Script", false, 20)]
         private static void AddToggleWhenWhitelisted()
         {
             AddPrefab(PrefabRoot + "Toggle When Whitelisted.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "Add Global Amplifier Toggle to Scene", false, 21)]
+        [MenuItem(AddToSceneRoot + "Global Amplifier Toggle", false, 21)]
         private static void AddGlobalAmplifier()
         {
             AddPrefab(PrefabRoot + "Toggles/Global Amplifier.prefab");
         }
 
 #if ERALLIE_PROTV_PACKAGE
-        [MenuItem(AddToSceneRoot + "Add Volume Sync Toggle to Scene", false, 22)]
+        [MenuItem(AddToSceneRoot + "Volume Sync Toggle", false, 22)]
         private static void AddVolumeSync()
         {
             AddPrefab(PrefabRoot + "Toggles/Volume Sync Toggle.prefab");
         }
 #endif
 
-        [MenuItem(AddToSceneRoot + "Add Whitelist Toggle to Scene", false, 23)]
+        [MenuItem(AddToSceneRoot + "Whitelist Toggle", false, 23)]
         private static void AddWhitelistToggle()
         {
             AddPrefab(PrefabRoot + "Toggles/Whitelist Toggle.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "/Examples/Add Microphone Example Prefab to Scene", false, 24)]
+        [MenuItem(AddToSceneRoot + "/Examples/Microphone Example Prefab", false, 24)]
         private static void AddMicrophone()
         {
             AddPrefab(PrefabRoot + "Microphone.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "/Examples/Add Stage Amplifier Example Prefab to Scene", false, 25)]
+        [MenuItem(AddToSceneRoot + "/Examples/Stage Amplifier Example Prefab", false, 25)]
         private static void AddStageAmplifier()
         {
             AddPrefab(PrefabRoot + "Stage Amplifier.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Add Microphone Toggle Example to Scene", false, 26)]
+        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Microphone Toggle Example", false, 26)]
         private static void AddMicrophoneToggle()
         {
             AddPrefab(PrefabRoot + "/Toggles/Whitelisted Toggle Examples/Microphone Toggle.prefab");
         }
 
-        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Add Stage Toggle Example to Scene", false, 27)]
+        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Stage Toggle Example", false, 27)]
         private static void AddStageToggle()
         {
             AddPrefab(PrefabRoot + "/Toggles/Whitelisted Toggle Examples/Stage Toggle.prefab");
+        }
+
+#if !ERALLIE_PROTV_PACKAGE && !ERALLIE_ACCESSTXL_PACKAGE
+        [MenuItem(OpenSceneRoot + "Example Scene", false, 50)]
+#else
+        [MenuItem(OpenSceneRoot + "Example Scene without Integrations", false, 50)]
+#endif
+        private static void OpenNormalScene()
+        {
+            OpenExampleScene(
+                SceneRoot + "Example Scene.unity");
+        }
+
+#if ERALLIE_PROTV_PACKAGE
+        [MenuItem(OpenSceneRoot + "Example Scene with ProTV", false, 51)]
+        private static void OpenProTVScene()
+        {
+            OpenExampleScene(
+                SceneRoot + "Example Scene With ProTV.unity");
+        }
+#endif
+
+#if ERALLIE_ACCESSTXL_PACKAGE
+        [MenuItem(OpenSceneRoot + "Example Scene with AccessTXL", false, 52)]
+        private static void OpenTXLScene()
+        {
+            OpenExampleScene(
+                SceneRoot + "Example Scene With AccessTXL.unity");
+        }
+#endif
+
+        private static bool CanUseSceneMenu()
+        {
+            return !EditorApplication.isPlayingOrWillChangePlaymode;
+        }
+
+        [MenuItem(AddToSceneRoot + "Add Whitelist Script to Scene", true)]
+        [MenuItem(AddToSceneRoot + "Add Toggle When Whitelisted Script to Scene", true)]
+        [MenuItem(AddToSceneRoot + "Add Global Amplifier Toggle to Scene", true)]
+        [MenuItem(AddToSceneRoot + "Add Whitelist Toggle to Scene", true)]
+        [MenuItem(AddToSceneRoot + "/Examples/Add Microphone Example Prefab to Scene", true)]
+        [MenuItem(AddToSceneRoot + "/Examples/Add Stage Amplifier Example Prefab to Scene", true)]
+        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Add Microphone Toggle Example to Scene", true)]
+        [MenuItem(AddToSceneRoot + "/Examples/Toggles/Add Stage Toggle Example to Scene", true)]
+        private static bool ValidateCommonMenuItems()
+        {
+            return CanUseSceneMenu();
+        }
+
+#if ERALLIE_PROTV_PACKAGE
+        [MenuItem(AddToSceneRoot + "Add ProTV Whitelist Bridge to Scene", true)]
+        [MenuItem(AddToSceneRoot + "Add Volume Sync Toggle to Scene", true)]
+        [MenuItem(OpenSceneRoot + "Open Example Scene with ProTV", true)]
+        private static bool ValidateProTVMenuItems()
+        {
+            return CanUseSceneMenu();
+        }
+#endif
+
+#if ERALLIE_ACCESSTXL_PACKAGE
+        [MenuItem(AddToSceneRoot + "Add AccessTXL Whitelist Bridge to Scene", true)]
+        [MenuItem(OpenSceneRoot + "Open Example Scene with AccessTXL", true)]
+        private static bool ValidateTXLMenuItems()
+        {
+            return CanUseSceneMenu();
+        }
+#endif
+
+#if !ERALLIE_PROTV_PACKAGE && !ERALLIE_ACCESSTXL_PACKAGE
+        [MenuItem(OpenSceneRoot + "Open Example Scene", true)]
+#else
+        [MenuItem(OpenSceneRoot + "Open Example Scene without Integrations", true)]
+#endif
+        private static bool ValidateNormalSceneMenuItem()
+        {
+            return CanUseSceneMenu();
+        }
+
+        private static void OpenExampleScene(string scenePath)
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                return;
+            }
+
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath) == null)
+            {
+                EditorUtility.DisplayDialog(
+                    "Scene Not Found",
+                    "No scene was found at:\n" + scenePath,
+                    "OK");
+                return;
+            }
+
+            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+            }
         }
 
         private static void AddPrefab(string prefabPath)
