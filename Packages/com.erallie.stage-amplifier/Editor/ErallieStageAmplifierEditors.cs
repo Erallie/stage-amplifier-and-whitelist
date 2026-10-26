@@ -207,6 +207,7 @@ namespace Erallie.StageAmplifierInspectors
                  property.propertyPath != "tvWhitelist" &&
                  property.propertyPath != "txlAccessControl" &&
                  property.propertyPath != "tvManager" &&
+                 property.propertyPath != "stageAmplifier" &&
                  property.propertyPath != "updateListener"))
             {
                 return null;
