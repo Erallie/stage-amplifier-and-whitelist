@@ -39,6 +39,7 @@ See [License and credits](#license-and-credits).
   - Optional ownership transfer and object respawning.
 - Local object and canvas visibility based on whitelist status.
 - Optional control of ProTV's shared volume setting.
+- Toggleable staff tags that hover above your head.
 - Custom inspectors with script descriptions, field help, and reference search buttons.
 - Tools menu for adding prefabs, opening example scenes, and assigning scene references.
 
@@ -73,7 +74,7 @@ configuring the components.
    **Include First Instance Master**.
 4. For optional integrations, add the corresponding bridge and configure it
    using the [integration instructions](#optional-integrations).
-5. Run **Assign All Scene References** from the Tools menu or a custom inspector.
+5. Run **Assign All Scene References** from the Tools menu.
    Review its report and resolve missing or ambiguous matches using individual
    **Find** buttons or manual assignments.
 6. Configure the stage trigger, separate barrier collider, and teleport destination in the **Stage Amplifier** script. These scene-specific references still need your own choices.
@@ -325,6 +326,20 @@ The component controls `TVManager.syncVolumeControl`.
 Without ProTV, its TV manager field is excluded and interaction has
 no effect on a TV system.
 
+### StaffTag and StaffTagToggle
+
+Shows a floating staff tag above a player's head. Each whitelisted player can
+show or hide their own tag independently using `StaffTagToggle`.
+
+The Staff Tag follows its assigned player's head with a **Vertical Offset** in meters (configurable in Unity).
+
+If a player leaves the world with their staff tag shown, it will be retained when they rejoin the world.
+
+Do not add `VRCObjectSync` to the tag prefab: the script calculates its local
+position and rotation.
+
+Keep `StaffTagToggle` in Whitelist's listener array so permission changes trigger its revocation checks.
+
 ## Voice settings
 
 The amplifiers feature a unique way of boosting your voice that's easy on the ears, not too loud when up close, and still heard well throughout the world.
@@ -406,6 +421,9 @@ the old listener component. Preserve any additional custom listener entries.
 | First master not recognized immediately | Check Include First Instance Master, Whitelist listener assignments, and initialization order. |
 | Player not teleported offstage | Assign Teleport On Kick Transform and confirm the stage trigger is active. |
 | Microphone does not respawn | Enable Respawn On Disable and add VRCObjectSync to the exact toggled object. |
+| Staff tag does not appear | Assign Whitelist and a prefab with StaffTag on its root; confirm access, compile UdonSharp, and check the Console. |
+| Staff tag stays after access is revoked | Confirm StaffTagToggle is in Whitelist's Listeners and the integration bridge notifies that Whitelist. Check whether another access source still authorizes the player. |
+| Staff tag does not return after rejoining | Confirm the same instance and display name, remaining whitelist access, and that the tag was not toggled off or revoked. |
 | ProTV fields missing | Make sure that ProTV is installed in the project, then allow Unity to recompile. |
 | Compile errors after removing an integration | Restore the current package files, including fallback scripts, runtime assembly definitions, UdonSharp registration assets, and Program Assets. Allow Unity and UdonSharp to recompile. |
 | Automatic assignment leaves fields empty | Check the Console for zero or multiple matches; add the missing component or use the field's Find button to select a candidate. |
@@ -429,6 +447,7 @@ The package includes:
 - Whitelist prefab.
 - Stage Amplifier prefab.
 - Microphone prefab.
+- Staff Tag and Staff Tag Toggle prefabs.
 - Stage and microphone toggle examples.
 - Standalone, ProTV, and AccessTXL example scenes.
 - Optional ProTV and AccessTXL whitelist bridge prefabs.
