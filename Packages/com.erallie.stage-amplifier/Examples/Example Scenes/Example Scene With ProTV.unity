@@ -2455,12 +2455,18 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 411823971}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 411823974}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 723155a4db03d654f879a63cfb7130f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &411823974 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4325301138549030513, guid: 3777b5012b70b5044a9d5332324b1d26,
+    type: 3}
+  m_PrefabInstance: {fileID: 411823971}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &518198375
 GameObject:
   m_ObjectHideFlags: 0
@@ -3486,8 +3492,8 @@ MonoBehaviour:
   useAssignedLayers: 0
   DynamicPrefabs: []
   DynamicMaterials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 2100000, guid: 7b354ac75661b1e469a0ad2fc1b6f887, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: -1055364252699146887, guid: f78258581153b0e42887e26ad5c58852, type: 3}
   - {fileID: 3876542345217667742, guid: f78258581153b0e42887e26ad5c58852, type: 3}
   - {fileID: 4006008569162626988, guid: f78258581153b0e42887e26ad5c58852, type: 3}
@@ -3638,6 +3644,10 @@ MonoBehaviour:
     - VRC.Udon.UdonBehaviour
   - gameObject: {fileID: 1171665842}
     ID: 31
+    SerializedTypeNames:
+    - VRC.Udon.UdonBehaviour
+  - gameObject: {fileID: 411823974}
+    ID: 33
     SerializedTypeNames:
     - VRC.Udon.UdonBehaviour
   portraitCameraPositionOffset: {x: 0, y: 0, z: 0}

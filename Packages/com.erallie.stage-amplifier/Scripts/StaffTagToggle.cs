@@ -183,6 +183,8 @@ public class StaffTagToggle : UdonSharpBehaviour
 
     public void WhitelistUpdated()
     {
+        RemoveUnauthorizedTags();
+
         bool allowed = CanUse(Networking.LocalPlayer);
 
         Collider controlCollider = GetComponent<Collider>();
@@ -199,7 +201,38 @@ public class StaffTagToggle : UdonSharpBehaviour
             controlMesh.enabled = !hideMeshIfNotWhitelisted || allowed;
         }
 
-        UpdateInteractionText();
+        RefreshTags();
+    }
+
+    private void RemoveUnauthorizedTags()
+    {
+        if (Networking.IsOwner(gameObject) && whitelist != null)
+        {
+            bool changed = false;
+
+            for (int i = activePlayerNames.Length - 1; i >= 0; i--)
+            {
+                VRCPlayerApi player =
+                    FindPlayerByName(activePlayerNames[i]);
+
+                // Keep absent players' preferences for when they return.
+                if (Utilities.IsValid(player) && !CanUse(player))
+                {
+                    RemovePlayerAt(i);
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                RequestSerialization();
+            }
+        }
+    }
+
+    public override void OnOwnershipTransferred(VRCPlayerApi player)
+    {
+        WhitelistUpdated();
     }
 
     private void UpdateInteractionText()
