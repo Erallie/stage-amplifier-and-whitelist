@@ -45,4 +45,35 @@ public class TXLWhitelistBridge : UdonSharpBehaviour
         }
     }
 }
+#else
+using UdonSharp;
+using UnityEngine;
+using VRC.SDKBase;
+
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+public class TXLWhitelistBridge : UdonSharpBehaviour
+{
+    [Tooltip("The Whitelist component to refresh when access permissions change.")]
+    public Whitelist updateListener;
+    [HideInInspector] public VRCPlayerApi accessPlayer;
+    [HideInInspector] public bool hasAccess;
+
+    public void CheckAccess()
+    {
+        hasAccess = false;
+    }
+
+    public void AccessUpdated()
+    {
+        if (updateListener != null)
+        {
+            updateListener.UpdateUI();
+        }
+    }
+
+    public void UpdateUI()
+    {
+        AccessUpdated();
+    }
+}
 #endif

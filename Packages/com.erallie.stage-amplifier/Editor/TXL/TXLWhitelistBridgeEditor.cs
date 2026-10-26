@@ -1,4 +1,4 @@
-#if UNITY_EDITOR && !COMPILER_UDONSHARP && ERALLIE_TXL_PACKAGE
+#if UNITY_EDITOR && !COMPILER_UDONSHARP
 using UnityEditor;
 
 namespace Erallie.StageAmplifierInspectors
@@ -8,7 +8,11 @@ namespace Erallie.StageAmplifierInspectors
     public class TXLWhitelistBridgeEditor : ErallieInspector
     {
         protected override string Description =>
-            "Adds TXL access permissions to your whitelist. Assign this bridge to Whitelist, and connect the existing Whitelist Update Listener below. Volume synchronization remains ProTV-only.";
+#if ERALLIE_TXL_PACKAGE
+            "Adds TXL access permissions to your whitelist. Connect the TXL Access Control and Whitelist components below.";
+#else
+            "Does nothing without AccessTXL / CommonTXL installed. Install AccessTXL to enable this whitelist bridge.";
+#endif
     }
 }
 #endif

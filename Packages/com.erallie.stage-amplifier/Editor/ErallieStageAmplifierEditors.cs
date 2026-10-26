@@ -158,6 +158,20 @@ namespace Erallie.StageAmplifierInspectors
             }
 
             serializedObject.ApplyModifiedProperties();
+
+            EditorGUILayout.Space(8);
+            using (new EditorGUI.DisabledScope(!CanFindSceneReference()))
+            {
+                if (GUILayout.Button("Assign All Scene References"))
+                {
+                    var component = target as Component;
+                    if (component != null)
+                    {
+                        StageAmplifierAutoAssign.Assign(component.gameObject.scene);
+                        serializedObject.Update();
+                    }
+                }
+            }
         }
 
         protected static Type FindBridgeType(string typeName)
@@ -173,7 +187,12 @@ namespace Erallie.StageAmplifierInspectors
             return null;
         }
 
-        private Type GetReferenceSearchType(SerializedProperty property)
+        public Type GetReferenceSearchType(SerializedProperty property)
+        {
+            return ResolveReferenceSearchType(target.GetType(), property);
+        }
+
+        public static Type ResolveReferenceSearchType(Type ownerType, SerializedProperty property)
         {
             if (property.propertyPath == "proTVAccessBridge")
             {
@@ -195,7 +214,6 @@ namespace Erallie.StageAmplifierInspectors
 
             // Resolve the field's existing compiled type. This Editor assembly
             // never needs to reference a ProTV class directly.
-            Type ownerType = target.GetType();
             while (ownerType != null)
             {
                 FieldInfo field = ownerType.GetField(property.name,
@@ -641,7 +659,7 @@ namespace Erallie.StageAmplifierInspectors
             EditorGUILayout.Space(6);
         }
 
-        private static int AddSceneListeners(global::Whitelist listener)
+        public static int AddSceneListeners(global::Whitelist listener, bool onlyAssigned = false)
         {
             var found = new List<UdonSharpBehaviour>();
 
@@ -688,6 +706,16 @@ namespace Erallie.StageAmplifierInspectors
             int added = 0;
             foreach (UdonSharpBehaviour candidate in found)
             {
+                if (onlyAssigned && candidate != null)
+                {
+                    var candidateObject = new SerializedObject(candidate);
+                    SerializedProperty whitelistReference = candidateObject.FindProperty("whitelist");
+                    if (whitelistReference == null ||
+                        whitelistReference.objectReferenceValue != listener)
+                    {
+                        continue;
+                    }
+                }
                 if (candidate == null || !assigned.Add(candidate))
                 {
                     continue;

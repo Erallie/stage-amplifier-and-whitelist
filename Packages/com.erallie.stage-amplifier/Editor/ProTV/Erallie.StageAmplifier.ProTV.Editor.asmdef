@@ -12,9 +12,7 @@
         "Editor"
     ],
     "autoReferenced": true,
-    "defineConstraints": [
-        "ERALLIE_PROTV_PACKAGE"
-    ],
+    "defineConstraints": [],
     "versionDefines": [
         {
             "name": "dev.architech.protv",

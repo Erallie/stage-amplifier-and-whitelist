@@ -9,9 +9,7 @@
     ],
     "includePlatforms": [],
     "autoReferenced": true,
-    "defineConstraints": [
-        "ERALLIE_TXL_PACKAGE"
-    ],
+    "defineConstraints": [],
     "versionDefines": [
         {
             "name": "com.texelsaur.common",
