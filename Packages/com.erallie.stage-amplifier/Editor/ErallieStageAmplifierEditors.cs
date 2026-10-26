@@ -162,19 +162,6 @@ namespace Erallie.StageAmplifierInspectors
 
             serializedObject.ApplyModifiedProperties();
 
-            EditorGUILayout.Space(8);
-            using (new EditorGUI.DisabledScope(!CanFindSceneReference()))
-            {
-                if (GUILayout.Button("Assign All Scene References"))
-                {
-                    var component = target as Component;
-                    if (component != null)
-                    {
-                        StageAmplifierAutoAssign.Assign(component.gameObject.scene);
-                        serializedObject.Update();
-                    }
-                }
-            }
         }
 
         protected static Type FindBridgeType(string typeName)
