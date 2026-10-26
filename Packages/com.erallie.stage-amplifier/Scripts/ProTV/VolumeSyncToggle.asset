@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: VolumeSyncToggle
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: e3006102db7b9b54f9e25a9bbb8f29ad,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: e59f8f411703c0c448fce1402adcb73d,
     type: 2}
   udonAssembly: 
   assemblyError: 
-  sourceCsScript: {fileID: 11500000, guid: 138b54da0135dc0459b1185446671e8f, type: 3}
+  sourceCsScript: {fileID: 11500000, guid: a85cc28582ffae748b65547863bc94ed, type: 3}
   scriptVersion: 2
   compiledVersion: 2
   behaviourSyncMode: 0

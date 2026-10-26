@@ -1,0 +1,24 @@
+{
+    "name": "Erallie.StageAmplifier.TXL.Editor",
+    "references": [
+        "Erallie.StageAmplifier.TXL",
+        "Erallie.StageAmplifier.Editor",
+        "UdonSharp.Runtime",
+        "UdonSharp.Editor",
+        "com.texelsaur.common"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "ERALLIE_TXL_PACKAGE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.texelsaur.common",
+            "expression": "0.0.0",
+            "define": "ERALLIE_TXL_PACKAGE"
+        }
+    ]
+}

@@ -4,9 +4,7 @@
         "UdonSharp.Runtime",
         "VRC.Udon",
         "VRC.SDK3",
-        "UnityEngine.UI",
-        "ArchiTech.ProTV.Runtime",
-        "ArchiTech.SDK.Runtime"
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -15,12 +13,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "dev.architech.protv",
-            "expression": "0.0.0",
-            "define": "ERALLIE_PROTV_PACKAGE"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

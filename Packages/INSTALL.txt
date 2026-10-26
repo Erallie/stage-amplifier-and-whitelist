@@ -1,0 +1,32 @@
+Close Unity and back up the package first.
+1. Remove Scripts/VolumeSyncToggle.cs and its .meta file. The replacement at
+   Scripts/ProTV/VolumeSyncToggle.cs preserves the SAME original GUID.
+2. Remove Integrations/TXL after backing it up. The replacement TXL files preserve
+   their original GUIDs. Remove Integrations too if it is now empty.
+3. Copy the included com.erallie.stage-amplifier folder into:
+   G:\Projects\VRChat\Unity_Projects\stage-amplifier-and-whitelist\Packages
+   Merge folders and replace matching files. Keep all other files.
+4. Reopen Unity.
+
+ProTV migration:
+- Add ErallieProTVWhitelistBridge to an active scene GameObject.
+- Assign its TV Whitelist (previously assigned on Whitelist and Whitelist Update
+  Listener) and the existing Update Listener. Find buttons are available.
+- Assign this bridge on Whitelist / Pro TV Access Bridge using Find.
+- Old ProTV references on Whitelist and WhitelistUpdateListener move to the bridge
+  and must be reassigned. Your listener array and standalone whitelist stay put.
+- VolumeSyncToggle keeps its script GUID and assignments. It is now ProTV-only;
+  remove unused volume-toggle components before removing ProTV.
+
+TXL:
+- Existing bridge script GUID is preserved.
+- Assign TXL Access Control and Update Listener on the bridge.
+- Assign Txl Access Bridge on Whitelist.
+
+The core assemblies no longer reference ProTV or TXL. Optional runtime/editor
+assemblies each detect their package through version defines and constraints.
+Microphone and stage amplification code is unchanged.
+C# compilation checks passed for core runtime, core editor, and ProTV runtime
+using this project's Unity references. Core checks excluded ProTV references.
+TXL compilation, Unity import/assembly discovery, Udon compilation, and ClientSim
+tests have not run. Test all package combinations before publishing.

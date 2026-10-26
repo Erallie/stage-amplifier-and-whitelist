@@ -1,0 +1,23 @@
+{
+    "name": "Erallie.StageAmplifier.ProTV",
+    "references": [
+        "Erallie.StageAmplifier.Runtime",
+        "UdonSharp.Runtime",
+        "VRC.Udon",
+        "VRC.SDKBase",
+        "ArchiTech.ProTV.Runtime",
+        "ArchiTech.SDK.Runtime"
+    ],
+    "includePlatforms": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "ERALLIE_PROTV_PACKAGE"
+    ],
+    "versionDefines": [
+        {
+            "name": "dev.architech.protv",
+            "expression": "0.0.0",
+            "define": "ERALLIE_PROTV_PACKAGE"
+        }
+    ]
+}

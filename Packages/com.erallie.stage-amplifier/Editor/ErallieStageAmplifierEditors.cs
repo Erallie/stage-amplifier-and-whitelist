@@ -115,6 +115,16 @@ namespace Erallie.StageAmplifierInspectors
                         continue;
                     }
                 }
+                if (property.propertyPath == "txlAccessBridge" &&
+                    FindBridgeType("TXLWhitelistBridge") == null)
+                {
+                    continue;
+                }
+                if (property.propertyPath == "proTVAccessBridge" &&
+                    FindBridgeType("ProTVWhitelistBridge") == null)
+                {
+                    continue;
+                }
                 Type referenceType = GetReferenceSearchType(property);
                 bool isFindableReference = referenceType != null;
 
@@ -150,11 +160,33 @@ namespace Erallie.StageAmplifierInspectors
             serializedObject.ApplyModifiedProperties();
         }
 
+        protected static Type FindBridgeType(string typeName)
+        {
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type bridge = assembly.GetType(typeName);
+                if (bridge != null)
+                {
+                    return bridge;
+                }
+            }
+            return null;
+        }
+
         private Type GetReferenceSearchType(SerializedProperty property)
         {
+            if (property.propertyPath == "proTVAccessBridge")
+            {
+                return FindBridgeType("ProTVWhitelistBridge");
+            }
+            if (property.propertyPath == "txlAccessBridge")
+            {
+                return FindBridgeType("TXLWhitelistBridge");
+            }
             if (property.propertyType != SerializedPropertyType.ObjectReference ||
                 (property.propertyPath != "whitelist" &&
                  property.propertyPath != "tvWhitelist" &&
+                 property.propertyPath != "txlAccessControl" &&
                  property.propertyPath != "tvManager" &&
                  property.propertyPath != "updateListener"))
             {
@@ -171,6 +203,11 @@ namespace Erallie.StageAmplifierInspectors
                     BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
                 if (field != null)
                 {
+                    if (property.propertyPath == "updateListener" &&
+                        field.FieldType == typeof(UdonSharpBehaviour))
+                    {
+                        return typeof(global::Whitelist);
+                    }
                     return typeof(Component).IsAssignableFrom(field.FieldType)
                         ? field.FieldType
                         : null;
@@ -401,22 +438,14 @@ namespace Erallie.StageAmplifierInspectors
             "Shows or hides the listed objects locally according to whether the current player is whitelisted. This script must NOT be in the same object as the Whitelist script.";
     }
 
-    [CustomEditor(typeof(global::VolumeSyncToggle))]
-    [CanEditMultipleObjects]
-    public class VolumeSyncToggleEditor : ErallieInspector
-    {
-        protected override string Description =>
-            "Lets whitelisted users enable or disable ProTV's shared volume control. This does nothing when ProTV is not installed.";
-    }
-
     [CustomEditor(typeof(global::Whitelist))]
     [CanEditMultipleObjects]
-    public class WhitelistEditor : ErallieInspector
+    public class WhitelistEditor : WhitelistListenersEditor
     {
         private string assignmentResult;
 
         protected override string Description =>
-            "Handles the whitelist for the Stage Amplifier system. Can be integrated with ProTV's whitelist system.";
+            "Handles the whitelist for the Stage Amplifier system. Can optionally use ProTV and TXL access permissions alongside its own whitelist.";
 
         public override void OnInspectorGUI()
         {
@@ -548,9 +577,7 @@ namespace Erallie.StageAmplifierInspectors
             "Whitelisted people can interact with this script to toggle objects on or off for everyone in the instance.";
     }
 
-    [CustomEditor(typeof(global::WhitelistUpdateListener))]
-    [CanEditMultipleObjects]
-    public class WhitelistUpdateListenerEditor : ErallieInspector
+    public abstract class WhitelistListenersEditor : ErallieInspector
     {
         private string findResult;
 
@@ -567,7 +594,7 @@ namespace Erallie.StageAmplifierInspectors
             bool canSearch = !EditorApplication.isPlayingOrWillChangePlaymode;
             foreach (UnityEngine.Object selected in targets)
             {
-                var listener = selected as global::WhitelistUpdateListener;
+                var listener = selected as global::Whitelist;
                 if (listener == null || EditorUtility.IsPersistent(listener) ||
                     !listener.gameObject.scene.IsValid() || !listener.gameObject.scene.isLoaded)
                 {
@@ -585,7 +612,7 @@ namespace Erallie.StageAmplifierInspectors
                     int totalAdded = 0;
                     foreach (UnityEngine.Object selected in targets)
                     {
-                        var listener = selected as global::WhitelistUpdateListener;
+                        var listener = selected as global::Whitelist;
                         if (listener != null)
                         {
                             totalAdded += AddSceneListeners(listener);
@@ -614,7 +641,7 @@ namespace Erallie.StageAmplifierInspectors
             EditorGUILayout.Space(6);
         }
 
-        private static int AddSceneListeners(global::WhitelistUpdateListener listener)
+        private static int AddSceneListeners(global::Whitelist listener)
         {
             var found = new List<UdonSharpBehaviour>();
 
@@ -625,7 +652,17 @@ namespace Erallie.StageAmplifierInspectors
                 found.AddRange(root.GetComponentsInChildren<global::GlobalAmplifier>(true));
                 found.AddRange(root.GetComponentsInChildren<global::StageWhitelistToggle>(true));
                 found.AddRange(root.GetComponentsInChildren<global::ToggleWhenWhitelisted>(true));
-                found.AddRange(root.GetComponentsInChildren<global::VolumeSyncToggle>(true));
+                Type volumeToggleType = FindBridgeType("VolumeSyncToggle");
+                if (volumeToggleType != null)
+                {
+                    foreach (Component control in root.GetComponentsInChildren(volumeToggleType, true))
+                    {
+                        if (control is UdonSharpBehaviour behaviour)
+                        {
+                            found.Add(behaviour);
+                        }
+                    }
+                }
                 found.AddRange(root.GetComponentsInChildren<global::WhitelistedToggle>(true));
                 found.AddRange(root.GetComponentsInChildren<global::StageAmplifier>(true));
             }

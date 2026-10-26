@@ -2,28 +2,20 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 
-#if ERALLIE_PROTV_PACKAGE
-using ArchiTech.ProTV;
-#endif
 
 public class Whitelist : UdonSharpBehaviour
 {
-    [Tooltip("Set this to the object with the WhitelistUpdateListener script.")]
-    public WhitelistUpdateListener updateListener;
+    [Header("TXL Access Control")]
+    [Tooltip("Optional Erallie TXL Whitelist Bridge. TXL permissions are added to the existing whitelist. Use Find to locate the bridge in this scene.")]
+    public UdonSharpBehaviour txlAccessBridge;
 
-#if ERALLIE_PROTV_PACKAGE
-    [Header("Architect TV Whitelist")]
-    [Tooltip("The TVManagedWhitelist component used by Architect's TV.")]
-    public TVManagedWhitelist tvWhitelist;
+    [Header("ProTV Whitelist")]
+    [Tooltip("Optional Erallie ProTV Whitelist Bridge. Its permissions are added to this whitelist.")]
+    public UdonSharpBehaviour proTVAccessBridge;
 
     [Header("Additional Whitelist")]
-    [Tooltip("Additional VRChat display names to whitelist on top of Architect's TV whitelist.")]
+    [Tooltip("Additional VRChat display names to whitelist alongside optional ProTV and TXL permissions.")]
     public string[] whitelist;
-#else
-    [Header("Whitelist")]
-    [Tooltip("VRChat display names to whitelist in the world.")]
-    public string[] whitelist;
-#endif
 
     [Tooltip("When enabled, the first instance master will also be included in the whitelist.")]
     public bool includeFirstInstanceMaster;
@@ -31,16 +23,35 @@ public class Whitelist : UdonSharpBehaviour
     [UdonSynced]
     private string owner;
 
+    [Header("Listeners")]
+    [Tooltip("Components to refresh whenever whitelist permissions change. Use the button below to collect supported components in this scene.")]
+    public UdonSharpBehaviour[] listeners;
+
+    private void Start()
+    {
+        UpdateUI();
+    }
+
+    public void UpdateUI()
+    {
+        if (listeners != null)
+        {
+            foreach (UdonSharpBehaviour listener in listeners)
+            {
+                if (listener != null)
+                {
+                    listener.SendCustomEvent("WhitelistUpdated");
+                }
+            }
+        }
+    }
+    
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
         if (string.IsNullOrEmpty(owner) && Networking.IsOwner(gameObject))
         {
             owner = player.displayName;
-
-            if (updateListener != null)
-            {
-                updateListener.UpdateUI();
-            }
+            UpdateUI();
         }
     }
 
@@ -56,16 +67,27 @@ public class Whitelist : UdonSharpBehaviour
             return false;
         }
 
-#if ERALLIE_PROTV_PACKAGE
-        if (Utilities.IsValid(tvWhitelist))
+        if (proTVAccessBridge != null)
         {
-            if (tvWhitelist._IsAuthorizedUser(player) ||
-                tvWhitelist._IsSuperUser(player))
+            proTVAccessBridge.SetProgramVariable("accessPlayer", player);
+            proTVAccessBridge.SendCustomEvent("CheckAccess");
+            object proTVResult = proTVAccessBridge.GetProgramVariable("hasAccess");
+            if (proTVResult != null && (bool)proTVResult)
             {
                 return true;
             }
         }
-#endif
+
+        if (txlAccessBridge != null)
+        {
+            txlAccessBridge.SetProgramVariable("accessPlayer", player);
+            txlAccessBridge.SendCustomEvent("CheckAccess");
+            object accessResult = txlAccessBridge.GetProgramVariable("hasAccess");
+            if (accessResult != null && (bool)accessResult)
+            {
+                return true;
+            }
+        }
 
         if (whitelist != null)
         {
