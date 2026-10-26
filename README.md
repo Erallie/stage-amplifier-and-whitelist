@@ -12,8 +12,8 @@
 
 A system with a voice amplifier and whitelist for VRChat worlds that is easy on the ears, doesn't get too loud, and can still be heard well globally.
 
-Use the standalone whitelist or optionally connect it to ArchiTech's
-ProTV whitelist.
+Use the standalone whitelist or optionally connect it to **ProTV** or
+**AccessTXL**. Neither integration is required for standalone use.
 
 Comes with a [Minimal Amplifier](#MinimalAmplifier) package in the VCC listing if you only want the amplifier with no extra settings.
 
@@ -34,12 +34,13 @@ See [License and credits](#license-and-credits).
 - Whitelist controls.
   - A standalone display-name whitelist.
   - Optional authorization of the first instance master.
-  - Can optionally integrate with ProTV's whitelist.
+  - Can optionally integrate with ProTV's or AccessTXL's whitelists.
 - Shared object toggles with whitelist-controlled interaction.
   - Optional ownership transfer and object respawning.
 - Local object and canvas visibility based on whitelist status.
 - Optional control of ProTV's shared volume setting.
-- Custom inspectors with descriptions, field help, and reference search buttons.
+- Custom inspectors with script descriptions, field help, and reference search buttons.
+- Tools menu for adding prefabs, opening example scenes, and assigning scene references.
 
 ## Installation
 
@@ -48,7 +49,7 @@ Companion, with the Worlds SDK and UdonSharp available.
 
 ### Through VCC
 
-Add the the listing to VCC [here](https://vcc.gozarproductions.com/), then add
+Add the listing to VCC [here](https://vcc.gozarproductions.com/), then add
 **Stage Amplifier and Whitelist** to your world project.
 
 ### Manual installation
@@ -65,27 +66,34 @@ configuring the components.
 
 ## Quick setup
 
-These instructions provide a starting setup. Customize the objects, meshes,
-controls, and appearance for your world.
+1. Open **Tools > Erallie > Stage Amplifier and Whitelist**.
+2. Use **Open Example Scene** for a starting example, or use **Add to Scene**
+   to add the Whitelist, Stage Amplifier, microphones, and controls you need.
+3. On **Whitelist**, enter exact VRChat display names and optionally enable
+   **Include First Instance Master**.
+4. For optional integrations, add the corresponding bridge and configure it
+   using the [integration instructions](#optional-integrations).
+5. Run **Assign All Scene References** from the Tools menu or a custom inspector.
+   Review its report and resolve missing or ambiguous matches using individual
+   **Find** buttons or manual assignments.
+6. Configure the stage trigger, separate barrier collider, and teleport destination in the **Stage Amplifier** script. These scene-specific references still need your own choices.
+7. Check **Listeners** on Whitelist. Use **Find and Add Whitelist Listeners**
+   when adding additional supported components.
+8. Save, then test in ClientSim and in a multi-client VRChat instance.
 
-1. Open **Example Scene Without ProTV** (or **Example Scene With ProTV** if using ProTV), or add the **Whitelist** and **Stage Amplifier** prefabs to your scene.
-2. Setup the Whitelist
-    - Add authorized players' exact VRChat display names under `Whitelist`.
-    - If using ProTV, click **Find** next to `Tv Whitelist` under the both the `Whitelist` and the `Whitelist Update Listener` scripts. This will ensure that any player authorized through ProTV's whitelist will also be treated as whitelisted.
-    - Optionally enable **Include First Instance Master**.
-3. Setup the Stage
-    - Configure the stage detection collider as a trigger. Use a separate, non-trigger collider as the physical barrier.
-    - Assign the stage's **Barrier Collider** and **Teleport On Kick Transform**.
-4. Add controls for whitelist-only access or global object toggling as needed.
-5. Setup the Update Listener
-    - Assign **Update Listener** on the whitelist. Use its **Find** button to locate a listener in the current scene.
-    - On the listener, click **Find and Add Whitelist Listeners**. Run this again whenever you add more supported components.
-6. Select the Whitelist component and click **Assign This Whitelist Throughout Scene** to assign it to all serialized Whitelist fields, including those on inactive objects. This replaces existing whitelist assignments and supports Undo with `Ctrl + Z`.
-7. Save the scene, then test in ClientSim and in a VRChat instance
-    with multiple clients.
+Copy example scenes into `Assets` before customizing and saving them so package
+updates do not overwrite your work. Added prefabs remain linked prefab instances;
+scene edits are overrides unless you explicitly apply them to the prefab asset.
 
-Copy example scenes into `Assets` before customizing them so package
-updates do not overwrite your changes.
+## Tools menu and inspector helpers
+
+Menu root: **Tools > Erallie > Stage Amplifier and Whitelist**.
+
+| Action | Purpose |
+| --- | --- |
+| Add to Scene | Adds configured example prefabs to the active scene |
+| Open Example Scene | Opens example scenes for your reference to copy in your own scene |
+| Assign All Scene References | Finds and fills eligible empty references in the active scene and collects supported whitelist listeners |
 
 ## Stage access rules
 
@@ -115,8 +123,8 @@ Determines whether a player is authorized.
 
 A player is authorized when any configured source permits them:
 
-- The linked ProTV whitelist recognizes them as an authorized user
-  or super user.
+- The ProTV bridge recognizes them as an authorized user or superuser.
+- The TXL bridge's assigned Access Control grants them access.
 - Their display name exactly matches a local whitelist entry.
 - **Include First Instance Master** is enabled and their name matches
   the initially recorded owner.
@@ -127,28 +135,14 @@ The initial owner name is recorded once through `OnPlayerJoined` by
 the owner of the whitelist object. It is not replaced when the
 instance master changes.
 
-Keep the whitelist object enabled. Assign **Update Listener** so
-dependent controls can refresh after initial owner recording.
-Custom scripts that change authorization should also refresh the
-listener.
+Keep the whitelist object enabled. It sends `WhitelistUpdated` to its listeners at startup, after recording
+the initial owner, and whenever `UpdateUI()` is called.
 
-The **Assign This Whitelist Throughout Scene** inspector button
-assigns this component to all serialized fields of type `Whitelist`
-on MonoBehaviours in the current scene, including inactive objects.
+Both integration bridges notify this Whitelist directly. Custom scripts that
+change authorization should call `Whitelist.UpdateUI()` after their change.
 
-It replaces existing references and supports Undo with `Ctrl + Z`.
-
-### WhitelistUpdateListener
-
-Sends the `WhitelistUpdated` custom event to its assigned listeners.
-
-Refreshes happen at startup and when `UpdateUI()` is called.
-
-With ProTV installed, this component derives from `TVPluginUI` and
-registers with the assigned ProTV whitelist.
-
-The **Find and Add Whitelist Listeners** button searches the current
-scene, including inactive objects, for:
+**Find and Add Whitelist Listeners** searches the current scene, including
+inactive objects, for these supported component types:
 
 - `GlobalAmplifier`
 - `StageAmplifier`
@@ -157,12 +151,12 @@ scene, including inactive objects, for:
 - `VolumeSyncToggle`
 - `WhitelistedToggle`
 
-It preserves existing assignments, fills empty slots, and avoids
-adding duplicate references. It searches known component types
-rather than examining arbitrary event names.
+It preserves existing entries, fills empty slots, and avoids duplicates. Review the
+list when your scene deliberately uses more than one Whitelist.
 
-Run the button again after adding supported components, then save
-the scene.
+The **Assign This Whitelist Throughout Scene** button assigns this component
+to serialized Whitelist fields throughout the scene, replacing existing
+assignments and supporting Undo.
 
 ### StageAmplifier
 
@@ -200,7 +194,7 @@ access and whitelist-only access.
 Assign:
 
 - The whitelist.
-- The linked `StageAmplifier`.
+- The linked `StageAmplifier`; use its **Find** button to locate one in the scene.
 - Optional mesh visibility and interaction text settings.
 
 Use a trigger collider for in-world interaction.
@@ -357,53 +351,65 @@ filtering. It does not restore custom settings from another system.
 
 Using scripts from other voice amplication systems to amplify the same player can overwrite each other's settings. Test combinations of microphones, stages, and other voice scripts together.
 
-## ProTV integration
+## Optional integrations
 
-You can integrate with ProTV's whitelist so that when you authorize users in-world in ProTV's whitelist, they are also treated as whitelisted by the stage amplifier and other toggles.
+Integrating with ProTV or AccessTXL allows people whitelisted through their system to be treated as whitelisted in our system; your own whitelist entries in our whitelist script remain whitelisted, and the option to auto-whitelist the first instance master for our system is set in our own whitelist. Neither ProTV nor TXL is required for the Stage Amplifier to function.
 
-ProTV-specific code is guarded by:
-
-`ERALLIE_PROTV_PACKAGE`
-
-Assembly version defines detect the VPM package:
-
-`dev.architech.protv`
-
-The integration uses:
-
-- `TVManagedWhitelist` for authorization.
-- `TVPluginUI` for whitelist update notifications.
-- `TVManager` for shared volume control.
-
-### Setup
+### ProTV
 
 1. Install ProTV and its dependencies separately.
-2. Assign its whitelist to this package's `Whitelist`.
-3. Assign the same ProTV whitelist to `WhitelistUpdateListener`.
-4. Configure inherited TV plugin references where applicable.
-5. Assign a TV manager to `VolumeSyncToggle`.
-6. Populate the listener list and test authorization changes.
+2. Add the **ProTV Whitelist Bridge** prefab or component.
+3. On `ProTVWhitelistBridge`, assign ProTV's **TV Whitelist** and your
+   **Whitelist** component in **Update Listener**.
+4. Assign this bridge to **Pro TV Access Bridge** on Whitelist.
+5. Populate Whitelist's listener list and test granting and revoking access.
 
-The standalone whitelist and first-master option are intended to work
-without ProTV.
+The bridge accepts ProTV authorized users and superusers and forwards ProTV
+permission-change notifications to `Whitelist.UpdateUI()`.
 
-ProTV **does not** need to be installed in the project for this package to work.
+**VolumeSyncToggle** is ProTV-only. Assign its Whitelist and ProTV `TVManager`
+to control `syncVolumeControl`. It does not synchronize VideoTXL volume.
+Without ProTV installed, the bridge grants no extra access and volume-sync
+interaction has no effect on a TV system.
 
-ProTV and ArchiTech dependencies remain under their own licenses.
+### AccessTXL
+
+1. Install AccessTXL and its CommonTXL dependency separately.
+2. Configure a TXL **Access Control** component. Enable **Enforce** and
+   **Allow Whitelist** for whitelist-based restrictions, and leave
+   **Allow Everyone** off when testing individual permissions.
+3. For runtime grants, connect the relevant **Dynamic Whitelist** to the Access
+   Control's **Whitelist Sources**. Configure the grant controls to update that
+   same source. Its Sync Player List's access settings determine who may grant
+   access; they may use a separate administrator Access Control.
+4. Add the **AccessTXL Whitelist Bridge** prefab or `TXLWhitelistBridge` component.
+5. Assign the intended **TXL Access Control** and your **Whitelist** component
+   in the bridge's **Update Listener** field.
+6. Assign the bridge to **Txl Access Bridge** on Whitelist.
+7. Populate Whitelist's listeners and test granting and revoking access.
+
+### Existing scenes using WhitelistUpdateListener
+
+The script Whitelist Update Listener has been embedded directly into the Whitelist script. If you set up this VCC package before version 0.1.0, you must transfer its listener entries to **Whitelist > Listeners**, or collect the
+supported components with **Find and Add Whitelist Listeners**. Point both
+bridges' **Update Listener** references to the Whitelist component, then remove
+the old listener component. Preserve any additional custom listener entries.
 
 ## Troubleshooting
 
 | Problem | Check |
 | --- | --- |
-| Whitelisted player blocked by an occupied stage | Confirm the stage's whitelist reference, rerun Find and Add Whitelist Listeners from `Whitelist Update Listeners`, and inspect other barrier controllers. |
+| Whitelisted player blocked by an occupied stage | Confirm the stage's whitelist reference, rerun Find and Add Whitelist Listeners on `Whitelist`, and inspect other barrier controllers. |
 | Interaction text does not change with toggle state | Enable Customize Interaction Text and configure both text fields. When disabled, existing interaction text is intentionally left untouched. |
 | Wrong whitelist assigned across the scene | Undo the scene-wide assignment with `Ctrl + Z`, then assign individual references when multiple whitelists are intentional. |
 | Control cannot be used | Check its whitelist reference, exact display name, collider, and listener refresh. |
-| First master not recognized immediately | Check Include First Instance Master, Update Listener, listener assignments, and initialization order. |
+| First master not recognized immediately | Check Include First Instance Master, Whitelist listener assignments, and initialization order. |
 | Player not teleported offstage | Assign Teleport On Kick Transform and confirm the stage trigger is active. |
 | Microphone does not respawn | Enable Respawn On Disable and add VRCObjectSync to the exact toggled object. |
 | ProTV fields missing | Make sure that ProTV is installed in the project, then allow Unity to recompile. |
-| Compile errors after removing ProTV | Inspect both assembly definitions for missing ArchiTech references as well as C# guards. |
+| Compile errors after removing an integration | Restore the current package files, including fallback scripts, runtime assembly definitions, UdonSharp registration assets, and Program Assets. Allow Unity and UdonSharp to recompile. |
+| Automatic assignment leaves fields empty | Check the Console for zero or multiple matches; add the missing component or use the field's Find button to select a candidate. |
+| TXL grants do not update visibility | Check the Dynamic Whitelist source, Allow Whitelist, bridge Access Control, bridge Update Listener pointing to Whitelist, and the affected control in Whitelist's Listeners array. |
 | Different clients see different states | Check ownership, synchronization mode, late joining, and serialization. |
 | Disabled objects cannot be re-enabled | Keep the toggle controller outside the hierarchy it disables. |
 
@@ -424,7 +430,8 @@ The package includes:
 - Stage Amplifier prefab.
 - Microphone prefab.
 - Stage and microphone toggle examples.
-- Example scenes with and without ProTV.
+- Standalone, ProTV, and AccessTXL example scenes.
+- Optional ProTV and AccessTXL whitelist bridge prefabs.
 - Stage and microphone models.
 
 ## License and credits
@@ -448,7 +455,7 @@ panel or the world's public description.
 Preserve the license and copyright notices when redistributing
 the package or source assets.
 
-Unity, VRChat, UdonSharp, ProTV, ArchiTech SDK, the upstream VPM
+Unity, VRChat, UdonSharp, ProTV, ArchiTech SDK, AccessTXL, CommonTXL, the upstream VPM
 template, and other third-party materials retain their respective
 licenses. This license does not relicense those materials or imply
 endorsement by their authors.
