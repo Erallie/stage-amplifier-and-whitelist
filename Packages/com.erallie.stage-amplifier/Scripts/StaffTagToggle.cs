@@ -20,7 +20,7 @@ public class StaffTagToggle : UdonSharpBehaviour
     public bool hideMeshIfNotWhitelisted;
 
     [UdonSynced]
-    private int[] activePlayerIds = new int[0];
+    private string[] activePlayerNames = new string[0];
 
     private GameObject[] spawnedTags = new GameObject[0];
 
@@ -74,7 +74,7 @@ public class StaffTagToggle : UdonSharpBehaviour
     {
         if (staffTagPrefab != null)
         {
-            int index = FindPlayerIndex(player.playerId);
+            int index = FindPlayerIndex(player.displayName);
 
             if (index >= 0)
             {
@@ -82,15 +82,16 @@ public class StaffTagToggle : UdonSharpBehaviour
             }
             else
             {
-                int[] updated = new int[activePlayerIds.Length + 1];
+                string[] updated =
+                    new string[activePlayerNames.Length + 1];
 
-                for (int i = 0; i < activePlayerIds.Length; i++)
+                for (int i = 0; i < activePlayerNames.Length; i++)
                 {
-                    updated[i] = activePlayerIds[i];
+                    updated[i] = activePlayerNames[i];
                 }
 
-                updated[updated.Length - 1] = player.playerId;
-                activePlayerIds = updated;
+                updated[updated.Length - 1] = player.displayName;
+                activePlayerNames = updated;
             }
 
             RefreshTags();
@@ -103,11 +104,11 @@ public class StaffTagToggle : UdonSharpBehaviour
         }
     }
 
-    private int FindPlayerIndex(int playerId)
+    private int FindPlayerIndex(string playerName)
     {
-        for (int i = 0; i < activePlayerIds.Length; i++)
+        for (int i = 0; i < activePlayerNames.Length; i++)
         {
-            if (activePlayerIds[i] == playerId)
+            if (activePlayerNames[i] == playerName)
             {
                 return i;
             }
@@ -118,19 +119,40 @@ public class StaffTagToggle : UdonSharpBehaviour
 
     private void RemovePlayerAt(int index)
     {
-        int[] updated = new int[activePlayerIds.Length - 1];
+        string[] updated =
+            new string[activePlayerNames.Length - 1];
+
         int destination = 0;
 
-        for (int i = 0; i < activePlayerIds.Length; i++)
+        for (int i = 0; i < activePlayerNames.Length; i++)
         {
             if (i != index)
             {
-                updated[destination] = activePlayerIds[i];
+                updated[destination] = activePlayerNames[i];
                 destination++;
             }
         }
 
-        activePlayerIds = updated;
+        activePlayerNames = updated;
+    }
+
+    private VRCPlayerApi FindPlayerByName(string playerName)
+    {
+        VRCPlayerApi[] players =
+            new VRCPlayerApi[VRCPlayerApi.GetPlayerCount()];
+
+        VRCPlayerApi.GetPlayers(players);
+
+        foreach (VRCPlayerApi player in players)
+        {
+            if (Utilities.IsValid(player) &&
+                player.displayName == playerName)
+            {
+                return player;
+            }
+        }
+
+        return null;
     }
 
     public override void OnDeserialization()
@@ -140,24 +162,22 @@ public class StaffTagToggle : UdonSharpBehaviour
 
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
-        // Resolve players whose synced IDs arrived before their join event.
+        // Recreate enabled tags when players join or return.
         RefreshTags();
         WhitelistUpdated();
     }
 
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
-        if (player != null && Networking.IsOwner(gameObject))
-        {
-            int index = FindPlayerIndex(player.playerId);
+        // Keep their saved enabled state, but remove their visual tag.
+        RefreshTags();
 
-            if (index >= 0)
-            {
-                RemovePlayerAt(index);
-                RequestSerialization();
-            }
-        }
+        // Refresh again after the departing player has been removed.
+        SendCustomEventDelayedFrames(nameof(RefreshAfterPlayerLeft), 1);
+    }
 
+    public void RefreshAfterPlayerLeft()
+    {
         RefreshTags();
     }
 
@@ -189,7 +209,7 @@ public class StaffTagToggle : UdonSharpBehaviour
 
         if (Utilities.IsValid(localPlayer))
         {
-            hasTag = FindPlayerIndex(localPlayer.playerId) >= 0;
+            hasTag = FindPlayerIndex(localPlayer.displayName) >= 0;
         }
 
         InteractionText = hasTag
@@ -217,12 +237,12 @@ public class StaffTagToggle : UdonSharpBehaviour
 
         if (staffTagPrefab != null)
         {
-            spawnedTags = new GameObject[activePlayerIds.Length];
+            spawnedTags = new GameObject[activePlayerNames.Length];
 
-            for (int i = 0; i < activePlayerIds.Length; i++)
+            for (int i = 0; i < activePlayerNames.Length; i++)
             {
                 VRCPlayerApi player =
-                    VRCPlayerApi.GetPlayerById(activePlayerIds[i]);
+                    FindPlayerByName(activePlayerNames[i]);
 
                 if (Utilities.IsValid(player))
                 {
