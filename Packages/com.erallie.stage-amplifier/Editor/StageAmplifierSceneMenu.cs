@@ -74,6 +74,12 @@ namespace Erallie.StageAmplifierInspectors
             AddPrefab(PrefabRoot + "Toggles/Whitelist Toggle.prefab");
         }
 
+        [MenuItem(AddToSceneRoot + "Staff Tag Toggle", false, 24)]
+        private static void AddStaffTagToggle()
+        {
+            AddPrefab(PrefabRoot + "Toggles/Staff Tag Toggle.prefab");
+        }
+
         [MenuItem(AddToSceneRoot + "/Microphone Example Prefab", false, 50)]
         private static void AddMicrophone()
         {

@@ -447,6 +447,22 @@ namespace Erallie.StageAmplifierInspectors
             "Shows or hides the listed objects locally according to whether the current player is whitelisted. This script must NOT be in the same object as the Whitelist script.";
     }
 
+    [CustomEditor(typeof(global::StaffTag))]
+    [CanEditMultipleObjects]
+    public class StaffTagEditor : ErallieInspector
+    {
+        protected override string Description =>
+            "Follows the assigned player's head with a configurable vertical offset and faces the local viewer.";
+    }
+
+    [CustomEditor(typeof(global::StaffTagToggle))]
+    [CanEditMultipleObjects]
+    public class StaffTagToggleEditor : ErallieInspector
+    {
+        protected override string Description =>
+            "Lets whitelisted players show or hide their own staff tag for everyone. Each player controls their own tag independently.";
+    }
+
     [CustomEditor(typeof(global::Whitelist))]
     [CanEditMultipleObjects]
     public class WhitelistEditor : WhitelistListenersEditor
@@ -674,6 +690,7 @@ namespace Erallie.StageAmplifierInspectors
                 }
                 found.AddRange(root.GetComponentsInChildren<global::WhitelistedToggle>(true));
                 found.AddRange(root.GetComponentsInChildren<global::StageAmplifier>(true));
+                found.AddRange(root.GetComponentsInChildren<global::StaffTagToggle>(true));
             }
 
             var componentObject = new SerializedObject(listener);
