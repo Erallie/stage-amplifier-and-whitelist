@@ -34,7 +34,7 @@ See [License and credits](#license-and-credits).
 - Whitelist controls.
   - A standalone display-name whitelist.
   - Optional authorization of the first instance master.
-  - Can optionally integrate with ProTV's or AccessTXL's whitelists.
+  - Can optionally integrate with AccessTXL or ProTV's whitelist.
 - Shared object toggles with whitelist-controlled interaction.
   - Optional ownership transfer and object respawning.
 - Local object and canvas visibility based on whitelist status.
