@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1658.6667
     height: 917.3334
   m_ShowMode: 4
-  m_Title: Project
+  m_Title: VRChat SDK
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -189,8 +189,8 @@ MonoBehaviour:
     y: 0
     width: 312
     height: 419.33334
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 13}
   m_Panes:
   - {fileID: 13}
@@ -420,7 +420,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 044affff504affffdc57ffff266fffff726fffff9479ffffc686ffff2287ffff4491ffff7e9effff969effff1eacffff2ebbffff8abbffff12c9ffff78d8ffffc4d8ffff7ce6ffffcafaffffac8b0100
+      m_ExpandedIDs: 5c52ffffa852ffff5860ffff7c73ffffba87ffffe488ffff0897ffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -801,9 +801,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -0.028614797, y: 1.9362204, z: -6.0688963}
+    m_Target: {x: 0, y: 1.46, z: 0}
     speed: 2
-    m_Value: {x: -0.028614797, y: 1.9362204, z: -6.0688963}
+    m_Value: {x: 0, y: 1.46, z: 0}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -849,13 +849,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.049986158, y: -0.0040177396, z: 0.00012031579, w: -0.9988709}
+    m_Target: {x: -0.01214293, y: -0.98238426, z: 0.06787769, w: -0.17447625}
     speed: 2
-    m_Value: {x: -0.04997981, y: -0.003018447, z: 0.000070318994, w: -0.99874574}
+    m_Value: {x: -0.012141257, y: -0.9822489, z: 0.06786834, w: -0.17445222}
   m_Size:
-    m_Target: 3.575168
+    m_Target: 0.19764236
     speed: 2
-    m_Value: 3.575168
+    m_Value: 0.19764236
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -1068,7 +1068,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Packages/com.erallie.stage-amplifier/Examples/Example Prefabs
+    - Packages/com.erallie.stage-amplifier/Examples/Example Scenes
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -1076,16 +1076,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Packages/com.erallie.stage-amplifier/Examples/Example Prefabs
+  - Packages/com.erallie.stage-amplifier/Examples/Example Scenes
   m_LastFoldersGridSize: -1
   m_LastProjectPath: G:\Projects\VRChat\Unity_Projects\stage-amplifier-and-whitelist
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 611}
-    m_SelectedIDs: 88800000
-    m_LastClickedID: 32904
-    m_ExpandedIDs: 000000007480000076800000788000007a8000007c8000007e80000080800000828000008480000086800000888000008a8000008c8000008e80000090800000928000009480000096800000988000009a8000009c8000009e80000000ca9a3bffffff7f
+    m_SelectedIDs: fa6c0100
+    m_LastClickedID: 93434
+    m_ExpandedIDs: 000000008a6c01008c6c01008e6c0100906c0100926c0100946c0100966c0100986c01009a6c01009c6c01009e6c0100a06c0100a26c0100a46c0100a66c0100a86c0100aa6c0100ac6c0100ae6c0100b06c0100b26c0100b46c010000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1113,7 +1113,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000007480000076800000788000007a8000007c8000007e80000080800000828000008480000086800000888000008a8000008c8000008e80000090800000928000009480000096800000988000009a8000009c8000009e800000
+    m_ExpandedIDs: 000000008a6c01008c6c01008e6c0100906c0100926c0100946c0100966c0100986c01009a6c01009c6c01009e6c0100a06c0100a26c0100a46c0100a66c0100a86c0100aa6c0100ac6c0100ae6c0100b06c0100b26c0100b46c0100
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1241,7 +1241,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 102934
+  m_LastSelectedObjectID: -30790
 --- !u!114 &21
 MonoBehaviour:
   m_ObjectHideFlags: 52

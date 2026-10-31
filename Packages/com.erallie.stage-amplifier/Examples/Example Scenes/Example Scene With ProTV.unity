@@ -3190,6 +3190,7 @@ MonoBehaviour:
   interactText: Use
   interactTextGO: {fileID: 0}
   proximity: 2
+  OutlineRenderers: []
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
@@ -3253,6 +3254,7 @@ MonoBehaviour:
   interactText: Use
   interactTextGO: {fileID: 0}
   proximity: 2
+  OutlineRenderers: []
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 1
   Reliable: 0
@@ -3277,7 +3279,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   launchedFromSDKPipeline: 0
   completedSDKPipeline: 0
-  blueprintId: wrld_9b89d90c-0bc8-4354-a29a-9797235e90af
+  blueprintId: wrld_757e9246-ce1d-4d6e-9527-5ba162456d25
   contentType: 1
   assetBundleUnityVersion: 
   fallbackStatus: 0
@@ -3492,8 +3494,8 @@ MonoBehaviour:
   useAssignedLayers: 0
   DynamicPrefabs: []
   DynamicMaterials:
-  - {fileID: 2100000, guid: 7b354ac75661b1e469a0ad2fc1b6f887, type: 2}
   - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 7b354ac75661b1e469a0ad2fc1b6f887, type: 2}
   - {fileID: -1055364252699146887, guid: f78258581153b0e42887e26ad5c58852, type: 3}
   - {fileID: 3876542345217667742, guid: f78258581153b0e42887e26ad5c58852, type: 3}
   - {fileID: 4006008569162626988, guid: f78258581153b0e42887e26ad5c58852, type: 3}
@@ -3670,6 +3672,7 @@ MonoBehaviour:
   interactText: Use
   interactTextGO: {fileID: 0}
   proximity: 2
+  OutlineRenderers: []
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0

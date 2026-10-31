@@ -24,19 +24,6 @@ public class StaffTag : UdonSharpBehaviour
 
             transform.position =
                 headPosition + Vector3.up * verticalOffset;
-
-            VRCPlayerApi localPlayer = Networking.LocalPlayer;
-
-            if (Utilities.IsValid(localPlayer))
-            {
-                Vector3 viewerPosition = localPlayer.GetTrackingData(
-                    VRCPlayerApi.TrackingDataType.Head).position;
-
-                if ((viewerPosition - transform.position).sqrMagnitude > 0.0001f)
-                {
-                    transform.LookAt(viewerPosition);
-                }
-            }
         }
     }
 }

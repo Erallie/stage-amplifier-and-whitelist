@@ -6,7 +6,7 @@
   "description": "A system with a voice amplifier and whitelist for VRChat worlds that is easy on the ears, doesn't get too loud, and can still be heard well globally. Can integrate with AccessTXL or ProTV's whitelist.",
   "vrchatVersion": "2022.1.1",
   "vpmDependencies": {
-    "com.vrchat.worlds": ">=3.10.5"
+    "com.vrchat.worlds": ">=3.10.6"
   },
   "author": {
     "name": "Erallie",
